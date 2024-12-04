@@ -13,11 +13,10 @@ int main() {
     
     UIObject* myobj = new UIObject(0, 0, 1, 1);
     UIObject* myobj2 = new UIObject(0.25, 0.25, 0.5, 0.5, {255, 0, 0, 255});
-    UIDraggable* myButton = new UIDraggable(0.85, 0.85, 0.1, 0.05, [myobj2]() {
-        myobj2->children->push_back(new UIObject(0.33, 0.33, 0.33, 0.33, PINK));
-    }, DARKGRAY);
+    UIDraggable* myButton = new UIDraggable(0.85, 0.85, 0.1, 0.05, DARKGRAY);
 
-    myobj->children = new vector<UIObject*>{ myobj2, myButton };
+    myobj->children = new vector<UIObject*>{ myobj2 };
+    myobj2->children = new vector<UIObject*>{ myButton };
     UIApp* myApp = new UIApp(myobj);
 
     while (!WindowShouldClose()) {

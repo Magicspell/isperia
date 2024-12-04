@@ -1,4 +1,8 @@
 - Optimize with UIObject.changed
 - See if we can make resizing update during resizing.
     - See https://stackoverflow.com/questions/78384007/raylib-when-resizing-the-window-the-background-is-black
-    
+- Implement sprites
+    - UIObjects have a reference to a sprite that they draw. (depending on width, height, etc.)
+    - Rectangle
+    - Oval
+    - Bitmap

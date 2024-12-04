@@ -4,6 +4,7 @@
 #include "raylib.h"
 
 #define DEFAULT_COLOR { 200, 125, 230, 255 }
+#define DEFAULT_CLICK [](){}    // Lambda that does nothing
 
 using namespace std;
 
@@ -27,8 +28,8 @@ protected:
 class UIClickable : public UIObject {
 public:
 	using FuncType = std::function<void()>; // typedef for a function pointer
-    UIClickable(float x, float y, float width, float height, FuncType click,
-        Color backgroundColor = DEFAULT_COLOR);
+    UIClickable(float x, float y, float width, float height, Color backgroundColor = DEFAULT_COLOR,
+        FuncType click = DEFAULT_CLICK);
     virtual void activateClick();   // Calls the object's click function.
     virtual void releaseClick();    // Called when the mouse is released.
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
@@ -39,13 +40,9 @@ protected:
 
 class UIDraggable : public UIClickable {
 public:
-    UIDraggable(float x, float y, float width, float height, FuncType click,
-        Color backgroundColor = DEFAULT_COLOR);
+    UIDraggable(float x, float y, float width, float height, Color backgroundColor = DEFAULT_COLOR,
+        FuncType click = DEFAULT_CLICK);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
-    // virtual void activateClick();   // Starts to move with mouse.
-    // virtual void releaseClick();   // Ends movement.
-protected:
-    // bool beingDragged = false;
 };
 
 class UIApp {
