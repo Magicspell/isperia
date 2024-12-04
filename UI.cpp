@@ -26,7 +26,6 @@ bool UIObject::getChanged() { return this->changed; }
 // Draws an UIObject. Parameters are the coords/size of ITSELF in PIXELS.
 void UIObject::draw(float x, float y, float width, float height) {
 
-
     // TODO: Optimize changed to mean "has this object changed since last frame OR have any
     // of its children"
     // if (this->changed) {
@@ -35,14 +34,6 @@ void UIObject::draw(float x, float y, float width, float height) {
     // }
     // _draw(x, y, width, height);
 }
-
-// Draws the children of a UIObject. Called from `draw()`. Takes the coordinates of the
-// UIObject (not it's parent, this is different from `draw()`) in pixels.
-// void UIObject::_draw(float x, float y, float width, float height) { 
-//     for (UIObject* c : *(this->children)) {
-//         c->draw(x, y, width, height);
-//     }
-// }
 
 // Updates all children. Parameters are the coords/size of its PARENT in PIXELS.
 // Will call `draw()`. Returns the coords/size of ITSELF in PIXELS as a rectangle.
@@ -77,10 +68,47 @@ Rectangle UIClickable::update(float pX, float pY, float pWidth, float pHeight) {
     // Check to see if the user is clicking the button.
     if (IsMouseButtonPressed(0)) {
         if (point_in_rect(GetMousePosition(), rect)) {
+            this->isClicked = true;
             this->activateClick();
         }
     }
+    
+    if (this->isClicked && !IsMouseButtonDown(0)) {
+        this->isClicked = false;
+        this->releaseClick();
+    }
+
     return rect;
+}
+
+void UIClickable::releaseClick() {
+    // Placeholder
+}
+
+// UIDraggable
+// -----------
+
+UIDraggable::UIDraggable(float x, float y, float width, float height, FuncType click,
+    Color backgroundColor): UIClickable(x, y, width, height, click, backgroundColor) {}
+
+Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
+    if (this->isClicked) {
+        // If we are being dragged, move according to mouse delta.
+            Vector2 mouseDelta = GetMouseDelta();
+
+            // We have to convert to percentage of parent. TODO: Helper function.
+            this->x += (mouseDelta.x - pX) / pWidth;
+            this->y += (mouseDelta.y - pY) / pWidth;
+            
+            // Ensure we are still in parent bounds. TODO: Do this by middle, not top left.
+            if (this->x > 1) this->x = 1;
+            if (this->x < 0) this->x = 0;
+            if (this->y > 1) this->y = 1;
+            if (this->y < 0) this->y = 0;
+
+    }
+
+    return UIClickable::update(pX, pY, pWidth, pHeight);
 }
 
 // UIApp
@@ -96,7 +124,6 @@ void UIApp::update() {
     BeginDrawing();
     // if (this->curScreen->getChanged()) {
     this->curScreen->update(0, 0, GetScreenWidth(), GetScreenHeight());
-    // this->curScreen->draw(0, 0, GetScreenWidth(), GetScreenHeight());
     // }
     EndDrawing();
 }

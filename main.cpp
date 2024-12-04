@@ -7,26 +7,14 @@
 
 using namespace std;
 
-
-// class Button : public UIClickable {
-// public:
-//     Button(float x, float y, float width, float height, FuncType click,
-//             Color backgroundColor = { 200, 125, 230, 255 }):
-//             UIClickable(x, y, width, height, click, backgroundColor) {
-//         this->click = []() {
-//             cout << "BUTTON CLICKED!!!!" << endl;
-//         };
-//     }
-// };
-
 int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WIDTH, HEIGHT, "Isperia: A Graph Theorist's Sketchpad");  // IMPORTANT NOTE: Must init window before doing any font stuff!
     
     UIObject* myobj = new UIObject(0, 0, 1, 1);
     UIObject* myobj2 = new UIObject(0.25, 0.25, 0.5, 0.5, {255, 0, 0, 255});
-    UIClickable* myButton = new UIClickable(0.85, 0.85, 0.1, 0.05, []() {
-        cout << "BUTTON CLICKED!!!" << endl;
+    UIDraggable* myButton = new UIDraggable(0.85, 0.85, 0.1, 0.05, [myobj2]() {
+        myobj2->children->push_back(new UIObject(0.33, 0.33, 0.33, 0.33, PINK));
     }, DARKGRAY);
 
     myobj->children = new vector<UIObject*>{ myobj2, myButton };
