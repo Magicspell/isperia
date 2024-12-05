@@ -14,7 +14,7 @@ int main() {
     
     SRectangle* myRectangle = new SRectangle({ 200, 125, 230, 255 });
     SRectangle* myRectangle2 = new SRectangle({255, 0, 0, 255});
-    SRectangle* myRectangle3 = new SRectangle(DARKGRAY);
+    SEllipse* myRectangle3 = new SEllipse(DARKGRAY);
     UIObject* myobj = new UIObject(0, 0, 1, 1, myRectangle);
     UIObject* myobj2 = new UIObject(0.25, 0.25, 0.5, 0.5, myRectangle2);
     UIDraggable* myButton = new UIDraggable(0.85, 0.85, 0.1, 0.05, myRectangle3);

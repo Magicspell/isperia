@@ -16,3 +16,10 @@ public:
     virtual void draw(float x, float y, float width, float height);
 protected:
 };
+
+class SEllipse : public Sprite {
+public:
+    SEllipse(Color backgroundColor);
+    virtual void draw(float x, float y, float width, float height);
+protected:
+};
