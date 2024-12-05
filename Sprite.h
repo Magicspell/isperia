@@ -4,6 +4,12 @@
 
 using namespace std;
 
+enum TextCentering {
+	LEFT,
+	CENTER,
+	RIGHT
+};
+
 // "Abstract" class for sprites
 class Sprite {
 public:
@@ -53,11 +59,16 @@ protected:
 
 class SText : public Sprite {
 public:
-    SText(Color backgroundColor, string text = "", int fontSize = 20);   // Use default font
-    SText(Color backgroundColor, Font font, string text = "", int fontSize = 20);
+    SText(Color backgroundColor, string text = "", int fontSize = 20,
+        TextCentering textCentering = LEFT);   // Use default font
+    SText(Color backgroundColor, Font font, string text = "", int fontSize = 20,
+        TextCentering textCentering = LEFT);
     virtual void draw(float x, float y, float width, float height);
+    string getText();
+    void setText(string text);
 protected:
     string text;
     Font font;
     int fontSize;
+    TextCentering textCentering;
 };

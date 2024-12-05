@@ -17,10 +17,7 @@ int main() {
     UIVertex* v2 = new UIVertex(0.15, 0.15, 0.1, "2");
     UIEdge* e1 = new UIEdge(v1, v2, new vector<Sprite*>{ new SLine(WHITE, 5) });
 
-    // SText* myText = new SText(YELLOW, "HELLO WORLD", 22);
-    // v2->addSprite(myText);
-
-    myGraph->setChildren(new vector<UIObject*>{ e1, v1, v2 });
+    myGraph->setChildren(new vector<UIObject*>{ e1, v1, v2});
     UIApp* myApp = new UIApp(myGraph);
 
     while (!WindowShouldClose()) {

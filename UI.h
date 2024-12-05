@@ -72,10 +72,14 @@ class UIVertex : public UIDraggable {
 public:
     UIVertex(float x, float y, float radius, string text = "", Color textColor = WHITE,
     int fontSize = 20);
+    // TODO: These constructors are bad:
     UIVertex(float x, float y, float width, float height);   // Default sprite: Circle
     UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites);
+    virtual void draw(float x, float y, float width, float height);
+    virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
 protected:
     string text;
+    SText* textSprite;
 };
 
 class UIEdge : public UIObject {

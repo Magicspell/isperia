@@ -182,10 +182,26 @@ UIVertex::UIVertex(float x, float y, float width, float height):
     // TODO: Default colors
 
 UIVertex::UIVertex(float x, float y, float radius, string text, Color textColor, int fontSize):
-    UIDraggable(x, y, radius, radius, new vector<Sprite*>{
-        new SCircle(RED),
-        new SText(textColor, text, fontSize)
-    }), text(text) {}
+    UIDraggable(x, y, radius, radius, new vector<Sprite*>{new SCircle(RED)}), text(text) {
+        // We keep a seperate sprite outside of sprites for text that is aways drawn over
+        // everything.
+        this->textSprite = new SText(textColor, text, fontSize, CENTER);
+    }
+
+void UIVertex::draw(float x, float y, float width, float height) {
+    UIDraggable::draw(x, y, width, height);
+
+    this->textSprite->draw(x, y, width, height);
+}
+
+Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight) {
+    // Always make sure the sprite's text matches the ui object's text, since
+    // we only change the ui object's.
+    this->textSprite->setText(this->text);
+
+    return UIDraggable::update(pX, pY, pWidth, pHeight);
+}
+
 
 // UIEdge
 // --------

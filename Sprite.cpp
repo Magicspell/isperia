@@ -67,12 +67,34 @@ void SLine::draw(float x1, float y1, float x2, float y2) {
 // SText
 // ----------
 
-SText::SText(Color backgroundColor, string text, int fontSize): Sprite(backgroundColor),
-    font(GetFontDefault()), text(text), fontSize(fontSize) {}
+SText::SText(Color backgroundColor, string text, int fontSize, TextCentering textCentering):
+    Sprite(backgroundColor), font(GetFontDefault()), text(text), fontSize(fontSize),
+    textCentering(textCentering) {}
 
-SText::SText(Color backgroundColor, Font font, string text, int fontSize):
-    Sprite(backgroundColor), font(font), text(text), fontSize(fontSize) {}
+SText::SText(Color backgroundColor, Font font, string text, int fontSize,
+    TextCentering textCentering): Sprite(backgroundColor), font(font), text(text),
+    fontSize(fontSize), textCentering(textCentering) {}
 
 void SText::draw(float x, float y, float width, float height) {
+    Vector2 textSize = MeasureTextEx(this->font, this->text.data(), this->fontSize, 0);
+    y = y + height / 2 - textSize.y / 2;    // Text is always centered vertically.
+
+    switch (this->textCentering) {
+    case LEFT: break;
+    case CENTER:
+        x = x + width / 2 - textSize.x / 2;
+        break;
+    case RIGHT:
+        x = x + width - textSize.x;
+        break;
+    }
     DrawTextEx(this->font, this->text.data(), {x, y}, this->fontSize, 0, this->backgroundColor);
+}
+
+void SText::setText(string text) {
+    this->text = text;
+}
+
+string SText::getText() {
+    return this->text;
 }
