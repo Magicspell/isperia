@@ -17,6 +17,15 @@ void SRectangle::draw(float x, float y, float width, float height) {
     DrawRectangle(x, y, width, height, this->backgroundColor);   
 }
 
+// SSquare
+// ----------
+
+SSquare::SSquare(Color backgroundColor): Sprite(backgroundColor) {}
+
+void SSquare::draw(float x, float y, float width, float height) {
+    DrawRectangle(x, y, width, width, this->backgroundColor);
+}
+
 // SEllipse
 // ----------
 
@@ -30,12 +39,24 @@ void SEllipse::draw(float x, float y, float width, float height) {
     DrawEllipse(centerX, centerY, radiusH, radiusV, this->backgroundColor);
 }
 
+// SCircle
+// ----------
+
+SCircle::SCircle(Color backgroundColor): Sprite(backgroundColor) {}
+
+void SCircle::draw(float x, float y, float width, float height) {
+    float radius = width / 2;
+    float centerX = x + radius;
+    float centerY = y + radius;
+    DrawCircle(centerX, centerY, radius, this->backgroundColor);
+}
+
 // SLine
 // ----------
 
 SLine::SLine(Color backgroundColor, float thickness): Sprite(backgroundColor),
     thickness(thickness) {}
 
-void SLine::draw(float x, float y, float width, float height) {
-    DrawLineEx({x, y}, {x + width, y + height}, this->thickness, this->backgroundColor);
+void SLine::draw(float x1, float y1, float x2, float y2) {
+    DrawLineEx({x1, y1}, {x2, y2}, this->thickness, this->backgroundColor);
 }

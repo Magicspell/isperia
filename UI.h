@@ -20,6 +20,15 @@ public:
     bool getChanged();
     void setChildren(vector<UIObject*>* children);
     vector<UIObject*>* getChildren(vector<UIObject*>* children);
+    float getX();
+    float getY();
+    float getWidth();
+    float getHeight();
+    void setX(float x);
+    void setY(float y);
+    void setWidth(float width);
+    void setHeight(float height);
+
 protected:
     vector<UIObject*>* children;
     float x;                // x coordinate in percentage of parent.
@@ -53,10 +62,28 @@ public:
 
 class UIGraph : public UIObject {
 public:
-    UIGraph(float x, float y, float width, float height);   // Default sprite: rectangle
+    UIGraph(float x, float y, float width, float height);   // Default sprite: Rectangle
     UIGraph(float x, float y, float width, float height, Sprite* sprite);
 protected:
+};
 
+class UIVertex : public UIDraggable {
+public:
+    UIVertex(float x, float y, float radius);
+    UIVertex(float x, float y, float width, float height);   // Default sprite: Circle
+    UIVertex(float x, float y, float width, float height, Sprite* sprite);
+protected:
+};
+
+class UIEdge : public UIObject {
+public:
+    UIEdge(UIVertex* vertex1, UIVertex* vertex2);             // Default sprite: Line
+    UIEdge(UIVertex* vertex1, UIVertex* vertex2, Sprite* sprite);
+    virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
+    
+protected:
+    UIVertex* vertex1;
+    UIVertex* vertex2;
 };
 
 class UIApp {

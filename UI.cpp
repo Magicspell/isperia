@@ -63,6 +63,38 @@ vector<UIObject*>* UIObject::getChildren(vector<UIObject*>* children) {
     return this->children;
 }
 
+float UIObject::getX() {
+    return this->x;
+}
+
+float UIObject::getY() {
+    return this->y;
+}
+
+float UIObject::getWidth() {
+    return this->width;
+}
+
+float UIObject::getHeight() {
+    return this->height;
+}
+
+void UIObject::setX(float x) {
+    this->x = x;
+}
+
+void UIObject::setY(float y) {
+    this->y = y;
+}
+
+void UIObject::setWidth(float width) {
+    this->width = width;
+}
+
+void UIObject::setHeight(float height) {
+    this->height = height;
+}
+
 
 // UIClickable
 // -----------
@@ -122,6 +154,60 @@ Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
 
     return UIClickable::update(pX, pY, pWidth, pHeight);
 }
+
+// UIGraph
+// -------
+
+UIGraph::UIGraph(float x, float y, float width, float height, Sprite* sprite):
+    UIObject(x, y, width, height, sprite) {}
+
+UIGraph::UIGraph(float x, float y, float width, float height):
+    UIObject(x, y, width, height, new SRectangle(BLACK)) {} // TODO: Default colors
+
+// UIVertex
+// --------
+
+UIVertex::UIVertex(float x, float y, float width, float height, Sprite* sprite):
+    UIDraggable(x, y, width, height, sprite) {}
+
+UIVertex::UIVertex(float x, float y, float width, float height):
+    UIDraggable(x, y, width, height, new SCircle(RED)) {} // TODO: Default colors
+
+UIVertex::UIVertex(float x, float y, float radius):
+    UIDraggable(x, y, radius, radius, new SCircle(RED)) {} 
+
+// UIEdge
+// --------
+
+// Edges must be siblings with their corresponding vertices as the coordinates are local
+// (percentages).
+
+UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2):
+    UIObject(vertex1->getX(), vertex1->getY(), vertex2->getX() - vertex1->getX(),
+    vertex2->getY() - vertex1->getY(), new SLine(WHITE)), vertex1(vertex1), vertex2(vertex2) {}
+    // TODO: Default colors
+
+UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2, Sprite* sprite):
+    UIObject(vertex1->getX(), vertex1->getY(), vertex2->getX() - vertex1->getX(),
+    vertex2->getY() - vertex1->getY(), sprite), vertex1(vertex1), vertex2(vertex2) {}
+
+Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight) {
+    // Find pixel values from vertex coords.
+    float x1 = pX + pWidth  * ((this->vertex1->getWidth() / 2)  + this->vertex1->getX());
+    float y1 = pY + pHeight * ((this->vertex1->getHeight() / 2) + this->vertex1->getY());
+    float x2 = pX + pWidth  * ((this->vertex2->getWidth() / 2)  + this->vertex2->getX());
+    float y2 = pY + pHeight * ((this->vertex2->getHeight() / 2) + this->vertex2->getY());
+
+    // Draw sprite. NOTE/TODO: this will break when the sprite isnt an SLine, since we are
+    // not using width/height. Also, TODO, weird because Sprite::draw args are x, y, width,
+    // and height and SLine::draw is x1, y1, x2, y2, so the arg locations mean different things.
+
+    this->sprite->draw(x1, y1, x2, y2);
+
+    return {x1, y1, x2 - x1, y2 - y1};  // TODO: Not actually the rectangle bc width/height
+                                        // could be negative.
+}
+
 
 // UIApp
 // -----

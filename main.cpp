@@ -12,20 +12,13 @@ int main() {
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WIDTH, HEIGHT, "Isperia: A Graph Theorist's Sketchpad");  // IMPORTANT NOTE: Must init window before doing any font stuff!
     
-    SRectangle* myRectangle = new SRectangle({ 200, 125, 230, 255 });
-    SRectangle* myRectangle2 = new SRectangle({255, 0, 0, 255});
-    SEllipse* myRectangle3 = new SEllipse(DARKGRAY);
-    SLine* myLine = new SLine(BLACK, 5);
+    UIGraph* myGraph = new UIGraph(0, 0, 1, 1);
+    UIVertex* v1 = new UIVertex(0.85, 0.85, 0.1);
+    UIVertex* v2 = new UIVertex(0.15, 0.15, 0.1);
+    UIEdge* e1 = new UIEdge(v1, v2, new SLine(WHITE, 5));
 
-    UIObject* myobj = new UIObject(0, 0, 1, 1, myRectangle);
-    UIDraggable* myButton = new UIDraggable(0.85, 0.85, 0.1, 0.05, myRectangle3);
-    UIObject* myobj2 = new UIObject(0.25, 0.25, 0.5, 0.5, myRectangle2,
-        new vector<UIObject*>{ myButton });
-
-    UIObject* myObj3 = new UIObject(0, 0, 1, 1, myLine);
-
-    myobj->setChildren(new vector<UIObject*>{  myObj3, myobj2 });
-    UIApp* myApp = new UIApp(myobj);
+    myGraph->setChildren(new vector<UIObject*>{ e1, v1, v2 });
+    UIApp* myApp = new UIApp(myGraph);
 
     while (!WindowShouldClose()) {
         myApp->update();
