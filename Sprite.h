@@ -23,3 +23,11 @@ public:
     virtual void draw(float x, float y, float width, float height);
 protected:
 };
+
+class SLine : public Sprite {
+public:
+    SLine(Color backgroundColor, float thickness = 1);
+    virtual void draw(float x, float y, float width, float height);
+protected:
+    float thickness;
+};

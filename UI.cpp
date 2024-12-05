@@ -6,10 +6,13 @@ using namespace std;
 // UIObject
 // --------
 
+UIObject::UIObject(float x, float y, float width, float height, Sprite* sprite,
+    vector<UIObject*>* children): x(x), y(y), width(width), height(height), sprite(sprite),
+    children(children) {}
+
 UIObject::UIObject(float x, float y, float width, float height, Sprite* sprite):
-        x(x), y(y), width(width), height(height), sprite(sprite) {
-    this->children = new vector<UIObject*>();
-}
+        x(x), y(y), width(width), height(height), sprite(sprite),
+        children(new vector<UIObject*>) {}
 
 UIObject::~UIObject(){
     // TODO: Is this too slow? Or will we only ever delete at the end of the program so it
@@ -51,6 +54,15 @@ Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight) {
 
     return {x, y, width, height};
 }
+
+void UIObject::setChildren(vector<UIObject*>* children) {
+    this->children = children;
+}
+
+vector<UIObject*>* UIObject::getChildren(vector<UIObject*>* children) {
+    return this->children;
+}
+
 
 // UIClickable
 // -----------

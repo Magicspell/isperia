@@ -13,12 +13,15 @@ using namespace std;
 class UIObject {
 public:
     UIObject(float x, float y, float width, float height, Sprite* sprite);
+    UIObject(float x, float y, float width, float height, Sprite* sprite, vector<UIObject*>* children);
     ~UIObject();
     virtual void draw(float x, float y, float width, float height);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
     bool getChanged();
-    vector<UIObject*>* children;
+    void setChildren(vector<UIObject*>* children);
+    vector<UIObject*>* getChildren(vector<UIObject*>* children);
 protected:
+    vector<UIObject*>* children;
     float x;                // x coordinate in percentage of parent.
     float y;                // y coordinate in percentage of parent.
     float width;            // Width in percentage of parent.
@@ -46,6 +49,14 @@ public:
     UIDraggable(float x, float y, float width, float height, Sprite* sprite,
         FuncType click = DEFAULT_CLICK);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
+};
+
+class UIGraph : public UIObject {
+public:
+    UIGraph(float x, float y, float width, float height);   // Default sprite: rectangle
+    UIGraph(float x, float y, float width, float height, Sprite* sprite);
+protected:
+
 };
 
 class UIApp {
