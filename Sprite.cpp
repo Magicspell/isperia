@@ -1,4 +1,7 @@
 #include "Sprite.h"
+#include <string>
+
+using namespace std;
 
 // Sprite
 // ------
@@ -59,4 +62,17 @@ SLine::SLine(Color backgroundColor, float thickness): Sprite(backgroundColor),
 
 void SLine::draw(float x1, float y1, float x2, float y2) {
     DrawLineEx({x1, y1}, {x2, y2}, this->thickness, this->backgroundColor);
+}
+
+// SText
+// ----------
+
+SText::SText(Color backgroundColor, string text, int fontSize): Sprite(backgroundColor),
+    font(GetFontDefault()), text(text), fontSize(fontSize) {}
+
+SText::SText(Color backgroundColor, Font font, string text, int fontSize):
+    Sprite(backgroundColor), font(font), text(text), fontSize(fontSize) {}
+
+void SText::draw(float x, float y, float width, float height) {
+    DrawTextEx(this->font, this->text.data(), {x, y}, this->fontSize, 0, this->backgroundColor);
 }

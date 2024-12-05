@@ -1,5 +1,8 @@
 #pragma once
 #include "raylib.h"
+#include <string>
+
+using namespace std;
 
 // "Abstract" class for sprites
 class Sprite {
@@ -46,4 +49,15 @@ public:
     virtual void draw(float x1, float y1, float x2, float y2);
 protected:
     float thickness;
+};
+
+class SText : public Sprite {
+public:
+    SText(Color backgroundColor, string text = "", int fontSize = 20);   // Use default font
+    SText(Color backgroundColor, Font font, string text = "", int fontSize = 20);
+    virtual void draw(float x, float y, float width, float height);
+protected:
+    string text;
+    Font font;
+    int fontSize;
 };

@@ -6,30 +6,32 @@ using namespace std;
 // UIObject
 // --------
 
-UIObject::UIObject(float x, float y, float width, float height, Sprite* sprite,
-    vector<UIObject*>* children): x(x), y(y), width(width), height(height), sprite(sprite),
+UIObject::UIObject(float x, float y, float width, float height, vector<Sprite*>* sprites,
+    vector<UIObject*>* children): x(x), y(y), width(width), height(height), sprites(sprites),
     children(children) {}
 
-UIObject::UIObject(float x, float y, float width, float height, Sprite* sprite):
-        x(x), y(y), width(width), height(height), sprite(sprite),
+UIObject::UIObject(float x, float y, float width, float height, vector<Sprite*>* sprites):
+        x(x), y(y), width(width), height(height), sprites(sprites),
         children(new vector<UIObject*>) {}
 
 UIObject::~UIObject(){
     // TODO: Is this too slow? Or will we only ever delete at the end of the program so it
     // doesnt matter?
+    // TODO: We do not delete sprites as there could be other objects referencing them.
+    // Should we?
     for (UIObject* c : *(this->children)) {
         delete c;
     }
     delete this->children;
-    delete this->sprite;
 }
 
 bool UIObject::getChanged() { return this->changed; }
 
 // Draws an UIObject. Parameters are the coords/size of ITSELF in PIXELS.
 void UIObject::draw(float x, float y, float width, float height) {
-    // DrawRectangle(x, y, width, height, this->backgroundColor);
-    this->sprite->draw(x, y, width, height);
+    for (Sprite* s : *this->sprites) {
+        s->draw(x, y, width, height);
+    }
 }
 
 // Updates all children. Parameters are the coords/size of its PARENT in PIXELS.
@@ -95,12 +97,16 @@ void UIObject::setHeight(float height) {
     this->height = height;
 }
 
+void UIObject::addSprite(Sprite* sprite) {
+    this->sprites->push_back(sprite);
+}
+
 
 // UIClickable
 // -----------
 
-UIClickable::UIClickable(float x, float y, float width, float height, Sprite* sprite,
-    FuncType click): UIObject(x, y, width, height, sprite), click(click) {}
+UIClickable::UIClickable(float x, float y, float width, float height, vector<Sprite*>* sprites,
+    FuncType click): UIObject(x, y, width, height, sprites), click(click) {}
 
 void UIClickable::activateClick() {
     this->click();
@@ -132,8 +138,8 @@ void UIClickable::releaseClick() {
 // UIDraggable
 // -----------
 
-UIDraggable::UIDraggable(float x, float y, float width, float height, Sprite* sprite,
-    FuncType click): UIClickable(x, y, width, height, sprite, click) {}
+UIDraggable::UIDraggable(float x, float y, float width, float height, vector<Sprite*>* sprites,
+    FuncType click): UIClickable(x, y, width, height, sprites, click) {}
 
 Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
     if (this->isClicked) {
@@ -158,23 +164,28 @@ Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
 // UIGraph
 // -------
 
-UIGraph::UIGraph(float x, float y, float width, float height, Sprite* sprite):
-    UIObject(x, y, width, height, sprite) {}
+UIGraph::UIGraph(float x, float y, float width, float height, vector<Sprite*>* sprites):
+    UIObject(x, y, width, height, sprites) {}
 
 UIGraph::UIGraph(float x, float y, float width, float height):
-    UIObject(x, y, width, height, new SRectangle(BLACK)) {} // TODO: Default colors
+    UIObject(x, y, width, height, new vector<Sprite*>{ new SRectangle(BLACK) }) {}
+    // TODO: Default colors
 
 // UIVertex
 // --------
 
-UIVertex::UIVertex(float x, float y, float width, float height, Sprite* sprite):
-    UIDraggable(x, y, width, height, sprite) {}
+UIVertex::UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites):
+    UIDraggable(x, y, width, height, sprites) {}
 
 UIVertex::UIVertex(float x, float y, float width, float height):
-    UIDraggable(x, y, width, height, new SCircle(RED)) {} // TODO: Default colors
+    UIDraggable(x, y, width, height, new vector<Sprite*>{ new SCircle(RED) }) {}
+    // TODO: Default colors
 
-UIVertex::UIVertex(float x, float y, float radius):
-    UIDraggable(x, y, radius, radius, new SCircle(RED)) {} 
+UIVertex::UIVertex(float x, float y, float radius, string text, Color textColor, int fontSize):
+    UIDraggable(x, y, radius, radius, new vector<Sprite*>{
+        new SCircle(RED),
+        new SText(textColor, text, fontSize)
+    }), text(text) {}
 
 // UIEdge
 // --------
@@ -184,12 +195,12 @@ UIVertex::UIVertex(float x, float y, float radius):
 
 UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2):
     UIObject(vertex1->getX(), vertex1->getY(), vertex2->getX() - vertex1->getX(),
-    vertex2->getY() - vertex1->getY(), new SLine(WHITE)), vertex1(vertex1), vertex2(vertex2) {}
+    vertex2->getY() - vertex1->getY(), new vector<Sprite*>{ new SLine(WHITE) }), vertex1(vertex1), vertex2(vertex2) {}
     // TODO: Default colors
 
-UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2, Sprite* sprite):
+UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2, vector<Sprite*>* sprites):
     UIObject(vertex1->getX(), vertex1->getY(), vertex2->getX() - vertex1->getX(),
-    vertex2->getY() - vertex1->getY(), sprite), vertex1(vertex1), vertex2(vertex2) {}
+    vertex2->getY() - vertex1->getY(), sprites), vertex1(vertex1), vertex2(vertex2) {}
 
 Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight) {
     // Find pixel values from vertex coords.
@@ -202,12 +213,11 @@ Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight) {
     // not using width/height. Also, TODO, weird because Sprite::draw args are x, y, width,
     // and height and SLine::draw is x1, y1, x2, y2, so the arg locations mean different things.
 
-    this->sprite->draw(x1, y1, x2, y2);
+    this->draw(x1, y1, x2, y2);
 
     return {x1, y1, x2 - x1, y2 - y1};  // TODO: Not actually the rectangle bc width/height
                                         // could be negative.
 }
-
 
 // UIApp
 // -----
