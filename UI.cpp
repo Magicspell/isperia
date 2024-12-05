@@ -1,4 +1,3 @@
-#include <iostream>
 #include "UI.h"
 #include "common.h"
 
@@ -7,8 +6,8 @@ using namespace std;
 // UIObject
 // --------
 
-UIObject::UIObject(float x, float y, float width, float height, Color backgroundColor):
-        x(x), y(y), width(width), height(height), backgroundColor(backgroundColor) {
+UIObject::UIObject(float x, float y, float width, float height, Sprite* sprite):
+        x(x), y(y), width(width), height(height), sprite(sprite) {
     this->children = new vector<UIObject*>();
 }
 
@@ -19,13 +18,15 @@ UIObject::~UIObject(){
         delete c;
     }
     delete this->children;
+    delete this->sprite;
 }
 
 bool UIObject::getChanged() { return this->changed; }
 
 // Draws an UIObject. Parameters are the coords/size of ITSELF in PIXELS.
 void UIObject::draw(float x, float y, float width, float height) {
-    DrawRectangle(x, y, width, height, this->backgroundColor);
+    // DrawRectangle(x, y, width, height, this->backgroundColor);
+    this->sprite->draw(x, y, width, height);
 }
 
 // Updates all children. Parameters are the coords/size of its PARENT in PIXELS.
@@ -54,8 +55,8 @@ Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight) {
 // UIClickable
 // -----------
 
-UIClickable::UIClickable(float x, float y, float width, float height, Color backgroundColor,
-    FuncType click): UIObject(x, y, width, height, backgroundColor), click(click) {}
+UIClickable::UIClickable(float x, float y, float width, float height, Sprite* sprite,
+    FuncType click): UIObject(x, y, width, height, sprite), click(click) {}
 
 void UIClickable::activateClick() {
     this->click();
@@ -87,8 +88,8 @@ void UIClickable::releaseClick() {
 // UIDraggable
 // -----------
 
-UIDraggable::UIDraggable(float x, float y, float width, float height, Color backgroundColor,
-    FuncType click): UIClickable(x, y, width, height, backgroundColor, click) {}
+UIDraggable::UIDraggable(float x, float y, float width, float height, Sprite* sprite,
+    FuncType click): UIClickable(x, y, width, height, sprite, click) {}
 
 Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
     if (this->isClicked) {
