@@ -35,7 +35,7 @@ public:
     UIObject(float x, float y, float width, float height, vector<Sprite*>* sprites,
         vector<UIObject*>* children);
     ~UIObject();
-    virtual void draw(float x, float y, float width, float height);
+    virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
     bool getChanged();
     void setChildren(vector<UIObject*>* children);
@@ -88,7 +88,7 @@ public:
     // TODO: These constructors are bad:
     // UIVertex(float x, float y, float width, float height);   // Default sprite: Circle
     // UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites);
-    virtual void draw(float x, float y, float width, float height);
+    virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
     int getId();
 protected:
@@ -114,6 +114,7 @@ public:
     UIGraph(float x, float y, float width, float height, Graph* backendGraph = new Graph(),
         vector<Sprite*>* sprites = new vector<Sprite*>{ new SRectangle(BLACK) });
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
+    virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
     void addVertex(float x, float y);
     void addEdge(int v1, int v2);
     vector<UIVertex*>* getVertices();

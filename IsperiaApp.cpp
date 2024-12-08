@@ -13,28 +13,28 @@ IsperiaApp::IsperiaApp(): UIApp(new UIObject(0, 0, 1, 1)) {
     this->mainScreen->addChild(gUI);
     this->mainScreen->addChild(this->toolbar);
 
-    gUI->getBackendGraph()->print();
-    cout << endl;
+    // gUI->getBackendGraph()->print();
+    // cout << endl;
 
-    gUI->addVertex(0.1, 0.1);
-    gUI->addVertex(0.5, 0.5);
-    gUI->getBackendGraph()->print();
-    cout << endl;
+    // gUI->addVertex(0.1, 0.1);
+    // gUI->addVertex(0.5, 0.5);
+    // gUI->getBackendGraph()->print();
+    // cout << endl;
 
-    gUI->addEdge(0, 1);
-    gUI->getBackendGraph()->print();
-    cout << endl;
+    // gUI->addEdge(0, 1);
+    // gUI->getBackendGraph()->print();
+    // cout << endl;
 
-    gUI->addVertex(0.75, 0.1);
-    gUI->addVertex(0.1, 0.75);
-    gUI->getBackendGraph()->print();
-    cout << endl;
+    // gUI->addVertex(0.75, 0.1);
+    // gUI->addVertex(0.1, 0.75);
+    // gUI->getBackendGraph()->print();
+    // cout << endl;
 
-    gUI->addEdge(0, 3);
-    gUI->addEdge(1, 3);
-    gUI->addEdge(2, 3);
-    gUI->getBackendGraph()->print();
-    cout << endl;
+    // gUI->addEdge(0, 3);
+    // gUI->addEdge(1, 3);
+    // gUI->addEdge(2, 3);
+    // gUI->getBackendGraph()->print();
+    // cout << endl;
 }
 
 void IsperiaApp::update() {

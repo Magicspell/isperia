@@ -30,7 +30,7 @@ UIObject::~UIObject(){
 bool UIObject::getChanged() { return this->changed; }
 
 // Draws an UIObject. Parameters are the coords/size of ITSELF in PIXELS.
-void UIObject::draw(float x, float y, float width, float height) {
+void UIObject::draw(float x, float y, float width, float height, State state) {
     for (Sprite* s : *this->sprites) {
         s->draw(x, y, width, height);
     }
@@ -48,7 +48,7 @@ Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight, Stat
     // of its children"
     // TODO: We can't implement changed without the screen flashing black every other frame.
     // if (this->changed) {
-        this->draw(x, y, width, height);
+        this->draw(x, y, width, height, state);
         // this->changed = false;
     // }
 
@@ -219,6 +219,10 @@ void UIGraph::setEdges(vector<UIEdge*>* edges) {
 Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State state) {
     Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight, state);
 
+    if (state.curTool != ADD_EDGE || IsMouseButtonPressed(1)) this->edgeAddMode = NONE_SELECTED;
+
+    // if (IsMouseButtonPressed(1)) this->edgeAddMode = NONE_SELECTED;
+
     // If the tool is ADD_VERTEX, then we need to check if user is clicking.
     // TODO: Code is copied from UIClickable, either make UIGraph a clickable or smth else.
     if (state.curTool == ADD_VERTEX && IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), rect)) {
@@ -257,6 +261,18 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
     return rect;
 }
 
+void UIGraph::draw(float x, float y, float width, float height, State state) {
+    UIObject::draw(x, y, width, height, state);
+
+    // Draw line if we are adding an edge
+    if (state.curTool == ADD_EDGE && this->edgeAddMode == ONE_SELECTED) {
+        float vX = this->v1->getX() * width + x + (this->v1->getWidth() * width / 2);
+        float vY = this->v1->getY() * height + y + (this->v1->getHeight() * height / 2);
+
+        DrawLineEx({vX, vY}, GetMousePosition(), 1 /* TODO: change to default var */, WHITE /* TODO: SAME*/);
+    }
+}
+
 Graph* UIGraph::getBackendGraph() {
     return this->backendGraph;
 }
@@ -281,8 +297,8 @@ UIVertex::UIVertex(float x, float y, float radius, int id, string text, Color te
         this->textSprite = new SText(textColor, text, fontSize, CENTER);
 }
 
-void UIVertex::draw(float x, float y, float width, float height) {
-    UIDraggable::draw(x, y, width, height);
+void UIVertex::draw(float x, float y, float width, float height, State state) {
+    UIDraggable::draw(x, y, width, height, state);
 
     this->textSprite->draw(x, y, width, height);
 }
