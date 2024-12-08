@@ -3,6 +3,7 @@
     - See https://stackoverflow.com/questions/78384007/raylib-when-resizing-the-window-the-background-is-black
 - Move Sprite into UI ?
 - Make it so overlapping clickables are not both clicked?
+- fix resizing window bugs
 
 DONE:
 - Implement sprites

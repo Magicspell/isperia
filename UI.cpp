@@ -6,6 +6,8 @@ using namespace std;
 // UIObject
 // --------
 
+UIObject::UIObject(float x, float y, float width, float height): UIObject(x, y, width, height, new vector<Sprite*>()) {}
+
 UIObject::UIObject(float x, float y, float width, float height, vector<Sprite*>* sprites,
     vector<UIObject*>* children): x(x), y(y), width(width), height(height), sprites(sprites),
     children(children) {}
@@ -59,6 +61,10 @@ Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight) {
 
 void UIObject::setChildren(vector<UIObject*>* children) {
     this->children = children;
+}
+
+void UIObject::addChild(UIObject* child) {
+    this->children->push_back(child);
 }
 
 vector<UIObject*>* UIObject::getChildren(vector<UIObject*>* children) {
@@ -117,7 +123,7 @@ Rectangle UIClickable::update(float pX, float pY, float pWidth, float pHeight) {
 
     // Check to see if the user is clicking the button.
     if (IsMouseButtonPressed(0)) {
-        if (point_in_rect(GetMousePosition(), rect)) {
+        if (pointInRect(GetMousePosition(), rect)) {
             this->isClicked = true;
             this->activateClick();
         }
@@ -165,11 +171,53 @@ Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
 // -------
 
 UIGraph::UIGraph(float x, float y, float width, float height, vector<Sprite*>* sprites):
-    UIObject(x, y, width, height, sprites) {}
+        UIObject(x, y, width, height, sprites) {
+    this->vertices = new vector<UIVertex*>();
+    this->edges = new vector<UIEdge*>();
+}
 
 UIGraph::UIGraph(float x, float y, float width, float height):
-    UIObject(x, y, width, height, new vector<Sprite*>{ new SRectangle(BLACK) }) {}
+    UIGraph(x, y, width, height, new vector<Sprite*>{ new SRectangle(BLACK) }) {}
     // TODO: Default colors
+
+void UIGraph::addVertex(UIVertex* vertex) {
+    this->vertices->push_back(vertex);
+}
+
+void UIGraph::addEdge(UIEdge* edge) {
+    this->edges->push_back(edge);
+}
+
+vector<UIVertex*>* UIGraph::getVertices() {
+    return this->vertices;
+}
+
+vector<UIEdge*>* UIGraph::getEdges() {
+    return this->edges;
+}
+
+void UIGraph::setVertices(vector<UIVertex*>* vertices) {
+    this->vertices = vertices;
+}
+
+void UIGraph::setEdges(vector<UIEdge*>* edges) {
+    this->edges = edges;
+}
+
+
+Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight) {
+    Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight);
+
+    for (UIEdge* e : *(this->edges)) {
+        e->update(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    for (UIVertex* v : *(this->vertices)) {
+        v->update(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    return rect;
+}
 
 // UIVertex
 // --------
@@ -186,7 +234,7 @@ UIVertex::UIVertex(float x, float y, float radius, string text, Color textColor,
         // We keep a seperate sprite outside of sprites for text that is aways drawn over
         // everything.
         this->textSprite = new SText(textColor, text, fontSize, CENTER);
-    }
+}
 
 void UIVertex::draw(float x, float y, float width, float height) {
     UIDraggable::draw(x, y, width, height);
@@ -201,7 +249,6 @@ Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight) {
 
     return UIDraggable::update(pX, pY, pWidth, pHeight);
 }
-
 
 // UIEdge
 // --------
@@ -220,10 +267,10 @@ UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2, vector<Sprite*>* sprites):
 
 Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight) {
     // Find pixel values from vertex coords.
-    float x1 = pX + pWidth  * ((this->vertex1->getWidth() / 2)  + this->vertex1->getX());
-    float y1 = pY + pHeight * ((this->vertex1->getHeight() / 2) + this->vertex1->getY());
-    float x2 = pX + pWidth  * ((this->vertex2->getWidth() / 2)  + this->vertex2->getX());
-    float y2 = pY + pHeight * ((this->vertex2->getHeight() / 2) + this->vertex2->getY());
+    float x1 = pX + pWidth  * ((this->vertex1->getWidth()   / 2) + this->vertex1->getX());
+    float y1 = pY + pHeight * ((this->vertex1->getHeight()  / 2) + this->vertex1->getY());
+    float x2 = pX + pWidth  * ((this->vertex2->getWidth()   / 2) + this->vertex2->getX());
+    float y2 = pY + pHeight * ((this->vertex2->getHeight()  / 2) + this->vertex2->getY());
 
     // Draw sprite. NOTE/TODO: this will break when the sprite isnt an SLine, since we are
     // not using width/height. Also, TODO, weird because Sprite::draw args are x, y, width,
@@ -234,6 +281,40 @@ Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight) {
     return {x1, y1, x2 - x1, y2 - y1};  // TODO: Not actually the rectangle bc width/height
                                         // could be negative.
 }
+
+// UIToolbar
+// ---------
+
+UIToolbar::UIToolbar(float x, float y, float width, float height):
+    UIToolbar(x, y, width, height, new vector<int>()) {}
+
+UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool):
+        UIObject(x, y, width, height, new vector<Sprite*>{ new SRectangle(GRAY) }), tools(tools),
+        curTool(curTool) {
+    
+    // Set up tool buttons
+    float paddingX = 0.1;
+    float paddingY = 0.01;
+    float buttonSize = 1.0 / this->tools->size();
+    cout << buttonSize << endl;
+    float curY = 0;
+    for (int t : *(this->tools)) {
+        UIClickable* b = new UIClickable(paddingX, curY + paddingY, 1 - paddingX * 2,
+                buttonSize - paddingY * 2, new vector<Sprite*>{
+            new SRectangle(LIGHTGRAY),
+            new SText(BLACK, to_string(t), 20, CENTER)
+        }, [this, t](){
+            this->setCurTool(t);
+        });
+        this->children->push_back(b);
+        curY += buttonSize;
+    }
+}
+
+void UIToolbar::setCurTool(int tool) {
+    this->curTool = tool;
+}
+
 
 // UIApp
 // -----

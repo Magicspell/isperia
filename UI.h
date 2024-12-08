@@ -12,6 +12,7 @@ using namespace std;
 
 class UIObject {
 public:
+    UIObject(float x, float y, float width, float height);
     UIObject(float x, float y, float width, float height, vector<Sprite*>* sprites);
     UIObject(float x, float y, float width, float height, vector<Sprite*>* sprites,
         vector<UIObject*>* children);
@@ -20,6 +21,7 @@ public:
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
     bool getChanged();
     void setChildren(vector<UIObject*>* children);
+    void addChild(UIObject* child);
     vector<UIObject*>* getChildren(vector<UIObject*>* children);
     float getX();
     float getY();
@@ -61,13 +63,6 @@ public:
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
 };
 
-class UIGraph : public UIObject {
-public:
-    UIGraph(float x, float y, float width, float height);   // Default sprite: Rectangle
-    UIGraph(float x, float y, float width, float height, vector<Sprite*>* sprites);
-protected:
-};
-
 class UIVertex : public UIDraggable {
 public:
     UIVertex(float x, float y, float radius, string text = "", Color textColor = WHITE,
@@ -91,6 +86,32 @@ public:
 protected:
     UIVertex* vertex1;
     UIVertex* vertex2;
+};
+
+class UIGraph : public UIObject {
+public:
+    UIGraph(float x, float y, float width, float height);   // Default sprite: Rectangle
+    UIGraph(float x, float y, float width, float height, vector<Sprite*>* sprites);
+    virtual Rectangle update(float pX, float pY, float pWidth, float pHeight);
+    void addVertex(UIVertex* vertex);
+    void addEdge(UIEdge* edge);
+    vector<UIVertex*>* getVertices();
+    vector<UIEdge*>* getEdges();
+    void setVertices(vector<UIVertex*>* vertices);
+    void setEdges(vector<UIEdge*>* edges);
+protected:
+    vector<UIVertex*>* vertices;
+    vector<UIEdge*>* edges;
+};
+
+class UIToolbar : public UIObject {
+public:
+    UIToolbar(float x, float y, float width, float height);
+    UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool = 0);
+    void setCurTool(int tool);
+private:
+    vector<int>* tools;
+    int curTool;
 };
 
 class UIApp {
