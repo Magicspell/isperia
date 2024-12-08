@@ -8,6 +8,7 @@
 
 #define DEFAULT_COLOR { 200, 125, 230, 255 }
 #define DEFAULT_CLICK [](){}    // Lambda that does nothing
+#define VERTEX_RADIUS 0.1
 
 struct State {
     int curTool;
@@ -80,6 +81,7 @@ public:
         FuncType click = DEFAULT_CLICK);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
 };
+
 class UIVertex : public UIDraggable {
 public:
     UIVertex(float x, float y, float radius, int id);

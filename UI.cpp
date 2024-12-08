@@ -191,7 +191,7 @@ UIGraph::UIGraph(float x, float y, float width, float height, Graph* backendGrap
 
 void UIGraph::addVertex(float x, float y) {
     int id = this->backendGraph->getSize();
-    this->vertices->push_back(new UIVertex(x, y, 0.1, id));
+    this->vertices->push_back(new UIVertex(x - VERTEX_RADIUS / 2, y - VERTEX_RADIUS / 2, VERTEX_RADIUS, id));
     this->backendGraph->addVertex(x, y);
 }
 
@@ -221,16 +221,16 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
 
     if (state.curTool != ADD_EDGE || IsMouseButtonPressed(1)) this->edgeAddMode = NONE_SELECTED;
 
-    // if (IsMouseButtonPressed(1)) this->edgeAddMode = NONE_SELECTED;
-
     // If the tool is ADD_VERTEX, then we need to check if user is clicking.
     // TODO: Code is copied from UIClickable, either make UIGraph a clickable or smth else.
     if (state.curTool == ADD_VERTEX && IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), rect)) {
         Vector2 mousePos = GetMousePosition();
 
         // Convert mousePos to local coords TODO: helper
-        float x = (mousePos.x - pX) / pWidth;
-        float y = (mousePos.y - pY) / pHeight;
+        float x = (mousePos.x - rect.x) / rect.width;
+        float y = (mousePos.y - rect.x) / rect.height;
+
+        cout << "X: " << x << ", Y: " << y << endl;
 
         this->addVertex(x, y);
     }
@@ -244,7 +244,6 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
 
         // Check if we are in edge add mode and if so check if we clicked on a vertex.
         if (state.curTool == ADD_EDGE && IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), vrect)) {
-            // cout << "CLICKED VERTEX: " << (int) v << endl;
             switch (this->edgeAddMode) {
             case NONE_SELECTED:
                 this->v1 = v;
@@ -279,13 +278,6 @@ Graph* UIGraph::getBackendGraph() {
 
 // UIVertex
 // --------
-
-// UIVertex::UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites):
-//     UIDraggable(x, y, width, height, sprites) {}
-
-// UIVertex::UIVertex(float x, float y, float width, float height):
-//     UIDraggable(x, y, width, height, new vector<Sprite*>{ new SCircle(RED) }) {}
-//     // TODO: Default colors
 
 UIVertex::UIVertex(float x, float y, float radius, int id):
     UIVertex(x, y, radius, id, to_string(id)) {}
