@@ -13,12 +13,18 @@ struct State {
     int curTool;
 };
 
+#define DEFAULT_STATE {0}
+
 enum Tool {
     SELECT,
-    ADD_VERTEX
+    ADD_VERTEX,
+    ADD_EDGE
 };
 
-#define DEFAULT_STATE {0}
+enum EdgeAddMode {
+    NONE_SELECTED,
+    ONE_SELECTED
+};
 
 using namespace std;
 
@@ -74,19 +80,21 @@ public:
         FuncType click = DEFAULT_CLICK);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
 };
-
 class UIVertex : public UIDraggable {
 public:
-    UIVertex(float x, float y, float radius, string text = "", Color textColor = WHITE,
-    int fontSize = 20);
+    UIVertex(float x, float y, float radius, int id);
+    UIVertex(float x, float y, float radius, int id, string text, Color textColor = WHITE,
+        int fontSize = 20);
     // TODO: These constructors are bad:
-    UIVertex(float x, float y, float width, float height);   // Default sprite: Circle
-    UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites);
+    // UIVertex(float x, float y, float width, float height);   // Default sprite: Circle
+    // UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites);
     virtual void draw(float x, float y, float width, float height);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
+    int getId();
 protected:
     string text;
     SText* textSprite;
+    int id;
 };
 
 class UIEdge : public UIObject {
@@ -117,6 +125,8 @@ protected:
     vector<UIVertex*>* vertices;
     vector<UIEdge*>* edges;
     Graph* backendGraph;
+    EdgeAddMode edgeAddMode = NONE_SELECTED;
+    UIVertex* v1;           // For adding edges
 };
 
 class UIToolbar : public UIObject {

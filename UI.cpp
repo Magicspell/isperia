@@ -190,7 +190,8 @@ UIGraph::UIGraph(float x, float y, float width, float height, Graph* backendGrap
 // }
 
 void UIGraph::addVertex(float x, float y) {
-    this->vertices->push_back(new UIVertex(x, y, 0.1, to_string(this->backendGraph->getSize())));
+    int id = this->backendGraph->getSize();
+    this->vertices->push_back(new UIVertex(x, y, 0.1, id));
     this->backendGraph->addVertex(x, y);
 }
 
@@ -235,7 +236,22 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
     }
 
     for (UIVertex* v : *(this->vertices)) {
-        v->update(rect.x, rect.y, rect.width, rect.height, state);
+        Rectangle vrect = v->update(rect.x, rect.y, rect.width, rect.height, state);
+
+        // Check if we are in edge add mode and if so check if we clicked on a vertex.
+        if (state.curTool == ADD_EDGE && IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), vrect)) {
+            // cout << "CLICKED VERTEX: " << (int) v << endl;
+            switch (this->edgeAddMode) {
+            case NONE_SELECTED:
+                this->v1 = v;
+                this->edgeAddMode = ONE_SELECTED;
+                break;
+            case ONE_SELECTED:
+                this->addEdge(this->v1->getId(), v->getId());
+                this->edgeAddMode = NONE_SELECTED;
+                break;
+            }
+        }
     }
 
     return rect;
@@ -248,15 +264,18 @@ Graph* UIGraph::getBackendGraph() {
 // UIVertex
 // --------
 
-UIVertex::UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites):
-    UIDraggable(x, y, width, height, sprites) {}
+// UIVertex::UIVertex(float x, float y, float width, float height, vector<Sprite*>* sprites):
+//     UIDraggable(x, y, width, height, sprites) {}
 
-UIVertex::UIVertex(float x, float y, float width, float height):
-    UIDraggable(x, y, width, height, new vector<Sprite*>{ new SCircle(RED) }) {}
-    // TODO: Default colors
+// UIVertex::UIVertex(float x, float y, float width, float height):
+//     UIDraggable(x, y, width, height, new vector<Sprite*>{ new SCircle(RED) }) {}
+//     // TODO: Default colors
 
-UIVertex::UIVertex(float x, float y, float radius, string text, Color textColor, int fontSize):
-    UIDraggable(x, y, radius, radius, new vector<Sprite*>{new SCircle(RED)}), text(text) {
+UIVertex::UIVertex(float x, float y, float radius, int id):
+    UIVertex(x, y, radius, id, to_string(id)) {}
+
+UIVertex::UIVertex(float x, float y, float radius, int id, string text, Color textColor, int fontSize):
+    UIDraggable(x, y, radius, radius, new vector<Sprite*>{new SCircle(RED)}), id(id), text(text) {
         // We keep a seperate sprite outside of sprites for text that is aways drawn over
         // everything.
         this->textSprite = new SText(textColor, text, fontSize, CENTER);
@@ -278,6 +297,10 @@ Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight, Stat
         return UIDraggable::update(pX, pY, pWidth, pHeight, state);
     }
     return UIObject::update(pX, pY, pWidth, pHeight, state);
+}
+
+int UIVertex::getId() {
+    return this->id;
 }
 
 // UIEdge
@@ -343,7 +366,6 @@ UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* t
 
 void UIToolbar::setCurTool(int tool) {
     this->curTool = tool;
-    cout << "SET CUR TOOL TO: " << this->curTool << endl;
 }
 
 int UIToolbar::getCurTool() {
