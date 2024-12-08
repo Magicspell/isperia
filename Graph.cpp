@@ -47,6 +47,36 @@ void Graph::addVertex(float x, float y, bool* connections) {
 
     delete this->adjMat;                                        // TODO: Wrong, need to delete all rows
     this->adjMat = newAdj;
+    this->print();
+}
+
+void Graph::removeVertex(int index) {
+    cout << "ATTEMPTING TO REMOVE VERTEX " << index << endl;
+    this->size -= 1;
+
+    bool** newAdj = (bool**) calloc(this->size, sizeof(bool*)); // Allocate new space.
+
+    for (int i = 0; i < this->size + 1; i++) {
+        if (i != index) {
+            int curI = i;
+            if (i > index) curI -= 1;
+
+            newAdj[curI] = (bool*) calloc(this->size, sizeof(bool));    // Allocate row.
+            for (int j = 0; j < this->size + 1; j++) {                  // Copy from old matrix.
+                if (j != index) {                                       // Make sure we dont copy element from
+                    int curJ = j;                                       // column we are removing.
+                    if (j > index) curJ -= 1;
+
+                    newAdj[curI][curJ] = this->adjMat[i][j];
+                } 
+            }
+        }
+    }
+
+    delete this->adjMat;                                        // TODO: Wrong, need to delete all rows
+    this->adjMat = newAdj;
+    this->print();
+    cout << "REMOVED VERTEX " << index << endl;
 }
 
 // void Graph::removeVertex(int index) {
@@ -69,16 +99,16 @@ void Graph::addVertex(float x, float y, bool* connections) {
 
 // Adds an edge between two vertices, provided by indexes of the adjacency matrix.
 void Graph::addEdge(int v1, int v2) {
-    // this->graphUI->addEdge(new UIEdge(this->getUIVertex(v1), this->getUIVertex(v2)));
-
     this->adjMat[v1][v2] = 1;
     this->adjMat[v2][v1] = 1;
+    this->print();
 }
 
 // Removes an edge between two vertices, provided by indexes of the adjacency matrix.
 void Graph::removeEdge(int v1, int v2) {
     this->adjMat[v1][v2] = 0;
     this->adjMat[v2][v1] = 0;
+    this->print();
 }
 
 // UIGraph* Graph::getUIGraph() {

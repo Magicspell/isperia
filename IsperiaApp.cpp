@@ -6,7 +6,8 @@ IsperiaApp::IsperiaApp(): UIApp(new UIObject(0, 0, 1, 1)) {
     this->toolbar = new UIToolbar(1 - TB_WIDTH + 0.001, 0, TB_WIDTH, 1, new vector<int>{
         SELECT,
         ADD_VERTEX,
-        ADD_EDGE
+        ADD_EDGE,
+        REMOVE_VERTEX
     });
 
     this->mainScreen = this->curScreen;     // SCUFFED

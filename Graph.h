@@ -9,7 +9,7 @@ public:
     ~Graph();
     void addVertex(float x, float y);
     void addVertex(float x, float y, bool* connections);
-    // void removeVertex(int index); TODO: IMPLEMENT
+    void removeVertex(int index);
     void addEdge(int v1, int v2);
     void removeEdge(int v1, int v2);
     // UIGraph* getUIGraph();

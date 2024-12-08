@@ -230,8 +230,6 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
         float x = (mousePos.x - rect.x) / rect.width;
         float y = (mousePos.y - rect.x) / rect.height;
 
-        cout << "X: " << x << ", Y: " << y << endl;
-
         this->addVertex(x, y);
     }
 
@@ -242,22 +240,70 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
     for (UIVertex* v : *(this->vertices)) {
         Rectangle vrect = v->update(rect.x, rect.y, rect.width, rect.height, state);
 
-        // Check if we are in edge add mode and if so check if we clicked on a vertex.
-        if (state.curTool == ADD_EDGE && IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), vrect)) {
-            switch (this->edgeAddMode) {
-            case NONE_SELECTED:
-                this->v1 = v;
-                this->edgeAddMode = ONE_SELECTED;
+        // If we are clicking on a vertex, proceed according to tool.
+        if (IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), vrect)) {
+            switch (state.curTool) {
+            case ADD_EDGE:
+                switch (this->edgeAddMode) {
+                case NONE_SELECTED:
+                    this->v1 = v;
+                    this->edgeAddMode = ONE_SELECTED;
+                    break;
+                case ONE_SELECTED:
+                    this->addEdge(this->v1->getId(), v->getId());
+                    this->edgeAddMode = NONE_SELECTED;
+                    break;
+                }
                 break;
-            case ONE_SELECTED:
-                this->addEdge(this->v1->getId(), v->getId());
-                this->edgeAddMode = NONE_SELECTED;
-                break;
+            case REMOVE_VERTEX:
+                this->removeVertex(v);
             }
         }
     }
 
     return rect;
+}
+
+void UIGraph::removeVertex(UIVertex* vertex) {
+    // Create new vertice vector
+    vector<UIVertex*>* newVertices = new vector<UIVertex*>();
+
+    for (UIVertex* v : *(this->vertices)) {
+        if (v != vertex) {
+            if (v->getId() > vertex->getId()) v->setId(v->getId() - 1);  // Ensure all ids match adj matrix.
+            newVertices->push_back(v);
+        }
+    }
+
+
+    // Remove underlying
+    this->backendGraph->removeVertex(vertex->getId());
+
+
+    vector<UIEdge*>* newEdges = new vector<UIEdge*>();
+    // Remove edges
+    for (UIEdge* e : *(this->edges)) {
+        if (!(e->getVertex1() == vertex || e->getVertex2() == vertex)) {
+            // ONLY remove UIEdge, since removeVertex() will also remove edge connections on the adj matrix.
+            newEdges->push_back(e);
+        }
+    }
+
+    delete this->edges;
+    this->edges = newEdges;
+
+    delete this->vertices;
+    this->vertices = newVertices;
+}
+
+void UIGraph::removeEdge(UIEdge* e) {
+    cout << "ATTEMPTING TO REMOVE EDGE FROM " << e->getVertex1()->getId() << " TO " << e->getVertex2()->getId() << endl;
+
+    // Remove underlying
+    this->backendGraph->removeEdge(e->getVertex1()->getId(), e->getVertex2()->getId());
+
+    // Remove UIEdge
+    this->edges->erase(find(this->edges->begin(), this->edges->end(), e));
 }
 
 void UIGraph::draw(float x, float y, float width, float height, State state) {
@@ -298,6 +344,7 @@ void UIVertex::draw(float x, float y, float width, float height, State state) {
 Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight, State state) {
     // Always make sure the sprite's text matches the ui object's text, since
     // we only change the ui object's.
+    this->text = to_string(this->id);
     this->textSprite->setText(this->text);
 
     // If the tool is select, then we can move vertices, otherwise we cannot.
@@ -309,6 +356,10 @@ Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight, Stat
 
 int UIVertex::getId() {
     return this->id;
+}
+
+void UIVertex::setId(int id) {
+    this->id = id;
 }
 
 // UIEdge
@@ -343,6 +394,14 @@ Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight, State 
                                         // could be negative.
 }
 
+UIVertex* UIEdge::getVertex1() {
+    return this->vertex1;
+}
+
+UIVertex* UIEdge::getVertex2() {
+    return this->vertex2;
+}
+
 // UIToolbar
 // ---------
 
@@ -357,7 +416,6 @@ UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* t
     float paddingX = 0.1;
     float paddingY = 0.01;
     float buttonSize = 1.0 / this->tools->size();
-    cout << buttonSize << endl;
     float curY = 0;
     for (int t : *(this->tools)) {
         UIClickable* b = new UIClickable(paddingX, curY + paddingY, 1 - paddingX * 2,

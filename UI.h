@@ -19,7 +19,8 @@ struct State {
 enum Tool {
     SELECT,
     ADD_VERTEX,
-    ADD_EDGE
+    ADD_EDGE,
+    REMOVE_VERTEX
 };
 
 enum EdgeAddMode {
@@ -93,6 +94,7 @@ public:
     virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
     int getId();
+    void setId(int id);
 protected:
     string text;
     SText* textSprite;
@@ -104,7 +106,8 @@ public:
     UIEdge(UIVertex* vertex1, UIVertex* vertex2);             // Default sprite: Line
     UIEdge(UIVertex* vertex1, UIVertex* vertex2, vector<Sprite*>* sprites);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
-    
+    UIVertex* getVertex1();
+    UIVertex* getVertex2();
 protected:
     UIVertex* vertex1;
     UIVertex* vertex2;
@@ -119,6 +122,8 @@ public:
     virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
     void addVertex(float x, float y);
     void addEdge(int v1, int v2);
+    void removeVertex(UIVertex* vertex);
+    void removeEdge(UIEdge* edge);
     vector<UIVertex*>* getVertices();
     vector<UIEdge*>* getEdges();
     void setVertices(vector<UIVertex*>* vertices);
