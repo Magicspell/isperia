@@ -38,7 +38,7 @@ void UIObject::draw(float x, float y, float width, float height) {
 
 // Updates all children. Parameters are the coords/size of its PARENT in PIXELS.
 // Will call `draw()`. Returns the coords/size of ITSELF in PIXELS as a rectangle.
-Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight) {
+Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight, State state) {
     float x = pX + pWidth * this->x;
     float y = pY + pHeight * this->y;
     float width = pWidth * this->width;
@@ -53,7 +53,7 @@ Rectangle UIObject::update(float pX, float pY, float pWidth, float pHeight) {
     // }
 
     for (UIObject* c : *(this->children)) {
-        c->update(x, y, width, height);
+        c->update(x, y, width, height, state);
     }
 
     return {x, y, width, height};
@@ -118,8 +118,8 @@ void UIClickable::activateClick() {
     this->click();
 }
 
-Rectangle UIClickable::update(float pX, float pY, float pWidth, float pHeight) {
-    Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight);
+Rectangle UIClickable::update(float pX, float pY, float pWidth, float pHeight, State state) {
+    Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight, state);
 
     // Check to see if the user is clicking the button.
     if (IsMouseButtonPressed(0)) {
@@ -147,7 +147,7 @@ void UIClickable::releaseClick() {
 UIDraggable::UIDraggable(float x, float y, float width, float height, vector<Sprite*>* sprites,
     FuncType click): UIClickable(x, y, width, height, sprites, click) {}
 
-Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
+Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight, State state) {
     if (this->isClicked) {
         // If we are being dragged, move according to mouse delta.
             Vector2 mouseDelta = GetMouseDelta();
@@ -164,28 +164,39 @@ Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight) {
             this->changed = true;
     }
 
-    return UIClickable::update(pX, pY, pWidth, pHeight);
+    return UIClickable::update(pX, pY, pWidth, pHeight, state);
 }
 
 // UIGraph
 // -------
 
-UIGraph::UIGraph(float x, float y, float width, float height, vector<Sprite*>* sprites):
-        UIObject(x, y, width, height, sprites) {
+UIGraph::UIGraph(float x, float y, float width, float height, Graph* backendGraph, vector<Sprite*>* sprites):
+        UIObject(x, y, width, height, sprites), backendGraph(backendGraph) {
     this->vertices = new vector<UIVertex*>();
     this->edges = new vector<UIEdge*>();
 }
 
-UIGraph::UIGraph(float x, float y, float width, float height):
-    UIGraph(x, y, width, height, new vector<Sprite*>{ new SRectangle(BLACK) }) {}
-    // TODO: Default colors
+// UIGraph::UIGraph(float x, float y, float width, float height):
+//     UIGraph(x, y, width, height, new Graph(), new vector<Sprite*>{ new SRectangle(BLACK) }) {}
+//     // TODO: Default colors
 
-void UIGraph::addVertex(UIVertex* vertex) {
-    this->vertices->push_back(vertex);
+
+// void UIGraph::addVertex(UIVertex* vertex) {
+//     this->vertices->push_back(vertex);
+// }
+
+// void UIGraph::addEdge(UIEdge* edge) {
+//     this->edges->push_back(edge);
+// }
+
+void UIGraph::addVertex(float x, float y) {
+    this->vertices->push_back(new UIVertex(x, y, 0.1, to_string(this->backendGraph->getSize())));
+    this->backendGraph->addVertex(x, y);
 }
 
-void UIGraph::addEdge(UIEdge* edge) {
-    this->edges->push_back(edge);
+void UIGraph::addEdge(int v1, int v2) {
+    this->edges->push_back(new UIEdge(this->vertices->at(v1), this->vertices->at(v2)));
+    this->backendGraph->addEdge(v1, v2);
 }
 
 vector<UIVertex*>* UIGraph::getVertices() {
@@ -204,19 +215,34 @@ void UIGraph::setEdges(vector<UIEdge*>* edges) {
     this->edges = edges;
 }
 
+Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State state) {
+    Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight, state);
 
-Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight) {
-    Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight);
+    // If the tool is ADD_VERTEX, then we need to check if user is clicking.
+    // TODO: Code is copied from UIClickable, either make UIGraph a clickable or smth else.
+    if (state.curTool == ADD_VERTEX && IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), rect)) {
+        Vector2 mousePos = GetMousePosition();
+
+        // Convert mousePos to local coords TODO: helper
+        float x = (mousePos.x - pX) / pWidth;
+        float y = (mousePos.y - pY) / pHeight;
+
+        this->addVertex(x, y);
+    }
 
     for (UIEdge* e : *(this->edges)) {
-        e->update(rect.x, rect.y, rect.width, rect.height);
+        e->update(rect.x, rect.y, rect.width, rect.height, state);
     }
 
     for (UIVertex* v : *(this->vertices)) {
-        v->update(rect.x, rect.y, rect.width, rect.height);
+        v->update(rect.x, rect.y, rect.width, rect.height, state);
     }
 
     return rect;
+}
+
+Graph* UIGraph::getBackendGraph() {
+    return this->backendGraph;
 }
 
 // UIVertex
@@ -242,12 +268,16 @@ void UIVertex::draw(float x, float y, float width, float height) {
     this->textSprite->draw(x, y, width, height);
 }
 
-Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight) {
+Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight, State state) {
     // Always make sure the sprite's text matches the ui object's text, since
     // we only change the ui object's.
     this->textSprite->setText(this->text);
 
-    return UIDraggable::update(pX, pY, pWidth, pHeight);
+    // If the tool is select, then we can move vertices, otherwise we cannot.
+    if (state.curTool == SELECT) {
+        return UIDraggable::update(pX, pY, pWidth, pHeight, state);
+    }
+    return UIObject::update(pX, pY, pWidth, pHeight, state);
 }
 
 // UIEdge
@@ -265,7 +295,7 @@ UIEdge::UIEdge(UIVertex* vertex1, UIVertex* vertex2, vector<Sprite*>* sprites):
     UIObject(vertex1->getX(), vertex1->getY(), vertex2->getX() - vertex1->getX(),
     vertex2->getY() - vertex1->getY(), sprites), vertex1(vertex1), vertex2(vertex2) {}
 
-Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight) {
+Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight, State state) {
     // Find pixel values from vertex coords.
     float x1 = pX + pWidth  * ((this->vertex1->getWidth()   / 2) + this->vertex1->getX());
     float y1 = pY + pHeight * ((this->vertex1->getHeight()  / 2) + this->vertex1->getY());
@@ -313,6 +343,11 @@ UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* t
 
 void UIToolbar::setCurTool(int tool) {
     this->curTool = tool;
+    cout << "SET CUR TOOL TO: " << this->curTool << endl;
+}
+
+int UIToolbar::getCurTool() {
+    return this->curTool;
 }
 
 
