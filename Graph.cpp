@@ -6,10 +6,10 @@
 using namespace std;
 
 Graph::Graph(int size): size(size) {
-    this->adjMat = (bool**) calloc(size, sizeof(bool*));
+    this->adjMat = (int**) calloc(size, sizeof(int*));
 
     for (int i = 0; i < size; i++) {
-        this->adjMat[i] = (bool*) calloc(size, sizeof(bool));
+        this->adjMat[i] = (int*) calloc(size, sizeof(int));
     }
 }
 
@@ -28,17 +28,17 @@ Graph::~Graph() {
 }
 
 void Graph::addVertex(float x, float y) {
-    this->addVertex(x, y, (bool*) calloc(this->size + 1, sizeof(bool)));
+    this->addVertex(x, y, (int*) calloc(this->size + 1, sizeof(int)));
 }
 
-void Graph::addVertex(float x, float y, bool* connections) {
+void Graph::addVertex(float x, float y, int* connections) {
     // this->graphUI->addVertex(new UIVertex(x, y, 0.1, to_string(this->size)));
     this->size += 1;
 
-    bool** newAdj = (bool**) calloc(this->size, sizeof(bool*)); // Allocate new space.
+    int** newAdj = (int**) calloc(this->size, sizeof(int*)); // Allocate new space.
 
     for (int i = 0; i < this->size - 1; i++) {
-        newAdj[i] = (bool*) calloc(this->size, sizeof(bool));   // Allocate row.
+        newAdj[i] = (int*) calloc(this->size, sizeof(int));   // Allocate row.
         memcpy(newAdj[i], this->adjMat[i], this->size - 1);     // Copy from old matrix.
         newAdj[i][this->size - 1] = connections[i];             // Set connections for last
                                                                 // element.
@@ -54,14 +54,14 @@ void Graph::removeVertex(int index) {
     cout << "ATTEMPTING TO REMOVE VERTEX " << index << endl;
     this->size -= 1;
 
-    bool** newAdj = (bool**) calloc(this->size, sizeof(bool*)); // Allocate new space.
+    int** newAdj = (int**) calloc(this->size, sizeof(int*)); // Allocate new space.
 
     for (int i = 0; i < this->size + 1; i++) {
         if (i != index) {
             int curI = i;
             if (i > index) curI -= 1;
 
-            newAdj[curI] = (bool*) calloc(this->size, sizeof(bool));    // Allocate row.
+            newAdj[curI] = (int*) calloc(this->size, sizeof(int));    // Allocate row.
             for (int j = 0; j < this->size + 1; j++) {                  // Copy from old matrix.
                 if (j != index) {                                       // Make sure we dont copy element from
                     int curJ = j;                                       // column we are removing.
@@ -84,11 +84,11 @@ void Graph::removeVertex(int index) {
 
 //     this->size -= 1;
 
-//     bool** newAdj = (bool**) calloc(this->size, sizeof(bool*)); // Allocate new space.
+//     int** newAdj = (int**) calloc(this->size, sizeof(int*)); // Allocate new space.
 
 //     for (int i = 0; i < this->size - 1; i++) {
 //         if (i != index) {
-//             newAdj[i] = (bool*) calloc(this->size, sizeof(bool));   // Allocate row.
+//             newAdj[i] = (int*) calloc(this->size, sizeof(int));   // Allocate row.
 //             memcpy(newAdj[i], this->adjMat[i], this->size - 1);     // Copy from old matrix.
 //         }
 //     }
@@ -148,4 +148,8 @@ void Graph::print() {
 
 int Graph::getSize() {
     return this->size;
+}
+
+int** Graph::getAdjMat() {
+    return this->adjMat;
 }

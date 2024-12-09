@@ -8,7 +8,7 @@ public:
     // Graph(UIGraph* graphUI, int initialSize);   // Fills with 0s
     ~Graph();
     void addVertex(float x, float y);
-    void addVertex(float x, float y, bool* connections);
+    void addVertex(float x, float y, int* connections);
     void removeVertex(int index);
     void addEdge(int v1, int v2);
     void removeEdge(int v1, int v2);
@@ -17,9 +17,10 @@ public:
     void print();
     void updateUIGraph();
     int getSize();
+    int** getAdjMat();
     
 protected:
-    bool** adjMat;
+    int** adjMat;
     int size;
     // UIGraph* graphUI;
 };

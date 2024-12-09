@@ -6,7 +6,7 @@
 #include "Graph.h"
 #include "IsperiaApp.h"
 
-#define WIDTH 720
+#define WIDTH 1080
 #define HEIGHT 720
 
 using namespace std;

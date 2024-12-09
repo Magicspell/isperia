@@ -228,7 +228,7 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
 
         // Convert mousePos to local coords TODO: helper
         float x = (mousePos.x - rect.x) / rect.width;
-        float y = (mousePos.y - rect.x) / rect.height;
+        float y = (mousePos.y - rect.y) / rect.height;
 
         this->addVertex(x, y);
     }
@@ -275,10 +275,8 @@ void UIGraph::removeVertex(UIVertex* vertex) {
         }
     }
 
-
     // Remove underlying
     this->backendGraph->removeVertex(vertex->getId());
-
 
     vector<UIEdge*>* newEdges = new vector<UIEdge*>();
     // Remove edges
@@ -345,7 +343,8 @@ Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight, Stat
     // Always make sure the sprite's text matches the ui object's text, since
     // we only change the ui object's.
     this->text = to_string(this->id);
-    this->textSprite->setText(this->text);
+    // this->textSprite->setText(this->text);
+    this->textSprite->setText("X: " + to_string(this->x) + ", Y: " + to_string(this->y));
 
     // If the tool is select, then we can move vertices, otherwise we cannot.
     if (state.curTool == SELECT) {
@@ -437,6 +436,15 @@ void UIToolbar::setCurTool(int tool) {
 int UIToolbar::getCurTool() {
     return this->curTool;
 }
+
+// UIMatrix
+// --------
+
+UIMatrix::UIMatrix(float x, float y, float width, float height, int** matrix):
+    UIObject(x, y, width, height), matrix(matrix) {}
+
+UIMatrix::UIMatrix(float x, float y, float width, float height, int** matrix, vector<Sprite*>* sprites):
+    UIObject(x, y, width, height, sprites), matrix(matrix) {}
 
 
 // UIApp

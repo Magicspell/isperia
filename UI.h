@@ -143,9 +143,17 @@ public:
     UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool = 0);
     void setCurTool(int tool);
     int getCurTool();
-private:
+protected:
     vector<int>* tools;
     int curTool;
+};
+
+class UIMatrix : public UIObject {
+public:
+    UIMatrix(float x, float y, float width, float height, int** matrix);
+    UIMatrix(float x, float y, float width, float height, int** matrix, vector<Sprite*>* sprites);
+protected:
+    int** matrix;
 };
 
 class UIApp {

@@ -76,7 +76,7 @@ SText::SText(Color backgroundColor, Font font, string text, int fontSize,
     fontSize(fontSize), textCentering(textCentering) {}
 
 void SText::draw(float x, float y, float width, float height) {
-    Vector2 textSize = MeasureTextEx(this->font, this->text.data(), this->fontSize, 0);
+    Vector2 textSize = MeasureTextEx(this->font, this->text.data(), this->fontSize, 1);
     y = y + height / 2 - textSize.y / 2;    // Text is always centered vertically.
 
     switch (this->textCentering) {
