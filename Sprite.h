@@ -2,6 +2,8 @@
 #include "raylib.h"
 #include <string>
 
+#define TEXT_SPACING 2
+
 using namespace std;
 
 enum TextCentering {

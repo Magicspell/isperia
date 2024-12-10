@@ -1,5 +1,6 @@
 # Isperia
 A graph theorist's sketchpad made for MATH 453. Written in C++ using raylib for graphics.
+
 ## Features
 ### Graph Display
 Isperia displays the graph with vertices that can be moved around by the user while maintaining adjacencies. The backend for the graph uses an adjacency matrix to represent it, and the UI system handles things like the position and size of nodes, and drawing the edges between them.
@@ -28,3 +29,11 @@ The number of components is displayed in the top left corner.
 ### Information on if the Graph is Bipartite
 Whether the graph is bipartite is shown in the top left corner.
 ### Eigenvalue and Eigenvector Information
+
+## Technical
+### Language
+Isperia is written in C++, with minimal dependencies. It is compiled to machine code to be used as an application, but also WebAssembly to be used on a website.
+### Graphics
+Isperia uses the Raylib library for a simpler access to graphics. It also allows for easy cross-platform graphics, like compiling to both machine code and WebAssembly.
+### UI System
+Isperia uses its own UI system, where each UI object has coordinates and dimensions as percentages of their parent's coordinates and dimensions. Then, when the screen needs to be drawn, the pixel values of these numbers are passed down throught the objects. This allows for easy resizability.

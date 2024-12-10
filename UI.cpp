@@ -154,7 +154,7 @@ Rectangle UIDraggable::update(float pX, float pY, float pWidth, float pHeight, S
 
             // We have to convert to percentage of parent. TODO: Helper function.
             this->x += mouseDelta.x / pWidth;
-            this->y += mouseDelta.y / pWidth;
+            this->y += mouseDelta.y / pHeight;
             
             // Ensure we are still in parent bounds. TODO: Do this by middle, not top left.
             if (this->x > 1) this->x = 1;
@@ -176,22 +176,9 @@ UIGraph::UIGraph(float x, float y, float width, float height, Graph* backendGrap
     this->edges = new vector<UIEdge*>();
 }
 
-// UIGraph::UIGraph(float x, float y, float width, float height):
-//     UIGraph(x, y, width, height, new Graph(), new vector<Sprite*>{ new SRectangle(BLACK) }) {}
-//     // TODO: Default colors
-
-
-// void UIGraph::addVertex(UIVertex* vertex) {
-//     this->vertices->push_back(vertex);
-// }
-
-// void UIGraph::addEdge(UIEdge* edge) {
-//     this->edges->push_back(edge);
-// }
-
 void UIGraph::addVertex(float x, float y) {
     int id = this->backendGraph->getSize();
-    this->vertices->push_back(new UIVertex(x - VERTEX_RADIUS / 2, y - VERTEX_RADIUS / 2, VERTEX_RADIUS, id));
+    this->vertices->push_back(new UIVertex(x, y, VERTEX_RADIUS, id));
     this->backendGraph->addVertex(x, y);
 }
 
@@ -230,7 +217,7 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
         float x = (mousePos.x - rect.x) / rect.width;
         float y = (mousePos.y - rect.y) / rect.height;
 
-        this->addVertex(x, y);
+        this->addVertex(x - VERTEX_RADIUS / 2, y - VERTEX_RADIUS / 2);
     }
 
     for (UIEdge* e : *(this->edges)) {
@@ -295,8 +282,6 @@ void UIGraph::removeVertex(UIVertex* vertex) {
 }
 
 void UIGraph::removeEdge(UIEdge* e) {
-    cout << "ATTEMPTING TO REMOVE EDGE FROM " << e->getVertex1()->getId() << " TO " << e->getVertex2()->getId() << endl;
-
     // Remove underlying
     this->backendGraph->removeEdge(e->getVertex1()->getId(), e->getVertex2()->getId());
 
@@ -336,21 +321,28 @@ UIVertex::UIVertex(float x, float y, float radius, int id, string text, Color te
 void UIVertex::draw(float x, float y, float width, float height, State state) {
     UIDraggable::draw(x, y, width, height, state);
 
-    this->textSprite->draw(x, y, width, height);
+    this->textSprite->draw(x, y, width, width);     // TODO: THIS IS A JANK FIX TO ENSURE
+                                                    // IT IS ALWAYS A SQUARE/CIRCLE,
+                                                    // IMLEMENT AN ACTUAL WAY TO DO THIS!
 }
 
 Rectangle UIVertex::update(float pX, float pY, float pWidth, float pHeight, State state) {
     // Always make sure the sprite's text matches the ui object's text, since
     // we only change the ui object's.
     this->text = to_string(this->id);
-    // this->textSprite->setText(this->text);
-    this->textSprite->setText("X: " + to_string(this->x) + ", Y: " + to_string(this->y));
+    this->textSprite->setText(this->text);
+
+    Rectangle rect;
 
     // If the tool is select, then we can move vertices, otherwise we cannot.
     if (state.curTool == SELECT) {
-        return UIDraggable::update(pX, pY, pWidth, pHeight, state);
+        rect =  UIDraggable::update(pX, pY, pWidth, pHeight, state);
     }
-    return UIObject::update(pX, pY, pWidth, pHeight, state);
+    rect =  UIObject::update(pX, pY, pWidth, pHeight, state);
+
+    // cout << "rect.X: " << rect.x << ", rect.Y: " << rect.y << ", rect.W: " << rect.width << ", rect.H: " << rect.height << endl;
+    // return rect;
+    return {rect.x, rect.y, rect.width, rect.width};        // TODO: MORE CIRCLE/SQUARE JANK
 }
 
 int UIVertex::getId() {
@@ -407,10 +399,9 @@ UIVertex* UIEdge::getVertex2() {
 UIToolbar::UIToolbar(float x, float y, float width, float height):
     UIToolbar(x, y, width, height, new vector<int>()) {}
 
-UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool):
-        UIObject(x, y, width, height, new vector<Sprite*>{ new SRectangle(GRAY) }), tools(tools),
-        curTool(curTool) {
-    
+UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools,
+        int curTool, vector<Sprite*>* sprites):
+        UIObject(x, y, width, height, sprites), tools(tools), curTool(curTool) {
     // Set up tool buttons
     float paddingX = 0.1;
     float paddingY = 0.01;
@@ -428,6 +419,9 @@ UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* t
         curY += buttonSize;
     }
 }
+
+UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool):
+    UIToolbar(x, y, width, height, tools, curTool, new vector<Sprite*>{ new SRectangle(GRAY) }) {}
 
 void UIToolbar::setCurTool(int tool) {
     this->curTool = tool;

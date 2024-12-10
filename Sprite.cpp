@@ -88,7 +88,7 @@ void SText::draw(float x, float y, float width, float height) {
         x = x + width - textSize.x;
         break;
     }
-    DrawTextEx(this->font, this->text.data(), {x, y}, this->fontSize, 0, this->backgroundColor);
+    DrawTextEx(this->font, this->text.data(), {x, y}, this->fontSize, TEXT_SPACING, this->backgroundColor);
 }
 
 void SText::setText(string text) {

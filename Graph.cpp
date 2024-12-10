@@ -51,7 +51,6 @@ void Graph::addVertex(float x, float y, int* connections) {
 }
 
 void Graph::removeVertex(int index) {
-    cout << "ATTEMPTING TO REMOVE VERTEX " << index << endl;
     this->size -= 1;
 
     int** newAdj = (int**) calloc(this->size, sizeof(int*)); // Allocate new space.
@@ -76,7 +75,6 @@ void Graph::removeVertex(int index) {
     delete this->adjMat;                                        // TODO: Wrong, need to delete all rows
     this->adjMat = newAdj;
     this->print();
-    cout << "REMOVED VERTEX " << index << endl;
 }
 
 // void Graph::removeVertex(int index) {
@@ -97,7 +95,7 @@ void Graph::removeVertex(int index) {
 //     this->adjMat = newAdj;
 // }
 
-// Adds an edge between two vertices, provided by indexes of the adjacency matrix.
+// Adds an edge between two vertices, provided by indices of the adjacency matrix.
 void Graph::addEdge(int v1, int v2) {
     this->adjMat[v1][v2] = 1;
     this->adjMat[v2][v1] = 1;

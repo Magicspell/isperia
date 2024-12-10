@@ -8,7 +8,7 @@
 
 #define DEFAULT_COLOR { 200, 125, 230, 255 }
 #define DEFAULT_CLICK [](){}    // Lambda that does nothing
-#define VERTEX_RADIUS 0.1
+#define VERTEX_RADIUS 0.06
 
 struct State {
     int curTool;
@@ -141,6 +141,8 @@ class UIToolbar : public UIObject {
 public:
     UIToolbar(float x, float y, float width, float height);
     UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool = 0);
+    UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool,
+        vector<Sprite*>* sprites);
     void setCurTool(int tool);
     int getCurTool();
 protected:
