@@ -13,6 +13,7 @@ Graph::Graph(int size): size(size) {
         this->adjMat[i] = (int*) calloc(size, sizeof(int));
         this->lapMat[i] = (int*) calloc(size, sizeof(int));
     }
+    this->updateEdgeCount();
 }
 
 Graph::Graph(): Graph(0) {}
@@ -34,20 +35,21 @@ void Graph::addVertex(float x, float y) {
 void Graph::addVertex(float x, float y, int* connections) {
     this->size += 1;
 
-    int** newAdj = (int**) calloc(this->size, sizeof(int*));    // Allocate new space.
+    int** newAdj = (int**) calloc(this->size, sizeof(int*));                    // Allocate new space.
 
     for (int i = 0; i < this->size - 1; i++) {
-        newAdj[i] = (int*) calloc(this->size, sizeof(int));     // Allocate row.
+        newAdj[i] = (int*) calloc(this->size, sizeof(int));                     // Allocate row.
         memcpy(newAdj[i], this->adjMat[i], (this->size - 1) * sizeof(int));     // Copy from old matrix.
-        newAdj[i][this->size - 1] = connections[i];             // Set connections for last
-                                                                // element.
+        newAdj[i][this->size - 1] = connections[i];                             // Set connections for last
+                                                                                // element.
     }
-    newAdj[this->size - 1] = connections;                       // Add last row (connections).
+    newAdj[this->size - 1] = connections;                                       // Add last row (connections).
 
-    delete this->adjMat;                                        // TODO: Wrong, need to delete all rows
+    delete this->adjMat;    // TODO: Wrong, need to delete all rows
     this->adjMat = newAdj;
 
     this->updateLapMat();
+    this->updateEdgeCount();
 }
 
 void Graph::removeVertex(int index) {
@@ -76,6 +78,7 @@ void Graph::removeVertex(int index) {
     this->adjMat = newAdj;
 
     this->updateLapMat();
+    this->updateEdgeCount();
 }
 
 // Adds an edge between two vertices, provided by indices of the adjacency matrix.
@@ -84,6 +87,7 @@ void Graph::addEdge(int v1, int v2) {
     this->adjMat[v2][v1] = 1;
 
     this->updateLapMat();
+    this->updateEdgeCount();
 }
 
 // Removes an edge between two vertices, provided by indexes of the adjacency matrix.
@@ -92,6 +96,7 @@ void Graph::removeEdge(int v1, int v2) {
     this->adjMat[v2][v1] = 0;
 
     this->updateLapMat();
+    this->updateEdgeCount();
 }
 
 void Graph::print() {
@@ -149,4 +154,20 @@ void Graph::updateLapMat() {
     // Delete old TODO: might not be deleting elements.
     delete this->lapMat;
     this->lapMat = newLap;
+}
+
+void Graph::updateEdgeCount() {
+    // Divide total degree by 2
+    int degree = 0;
+    for (int i = 0; i < this->size; i++) {
+        for (int j = 0; j < this->size; j++) {
+            degree += this->adjMat[i][j];
+        }
+    }
+
+    this->edgeCount = degree / 2;
+}
+
+int Graph::getEdgeCount() {
+    return this->edgeCount;
 }

@@ -15,8 +15,6 @@ public:
     void removeVertex(int index);
     void addEdge(int v1, int v2);
     void removeEdge(int v1, int v2);
-    // UIGraph* getUIGraph();
-    // UIVertex* getUIVertex(int index);
     void print();
     void updateUIGraph();
     int getSize();
@@ -24,9 +22,12 @@ public:
     int** getLapMat();
     int** getMatByType(MatType matType);
     void updateLapMat();
+    int getEdgeCount();
+    void updateEdgeCount();
     
 protected:
     int** adjMat;
     int** lapMat;
     int size;
+    int edgeCount;
 };

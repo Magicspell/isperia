@@ -3,11 +3,8 @@
     - See https://stackoverflow.com/questions/78384007/raylib-when-resizing-the-window-the-background-is-black
 - Move Sprite into UI ?
 - Make it so overlapping clickables are not both clicked?
-- fix resizing window bugs
-### Adjacency Matrix Display
-Displays the graph's adjacency matrix, which shows which vertices are joined together by having a 1 at `adjMat[i][j]` if vertices with index `i` and `j` are joined and 0 if not.
-### Laplacian Matrix Display
-Displays the graph's Laplacian matrix, which has the degree of vertices on the diagonal, -1 wherever two vertices are joined, and 0 everywhere else. We calculate the laplacian matrix by subtracting the adjacency matrix from the degree matrix.
+- Fix loops (either allow them and display them or do not allow them)
+- Make it so you cannot place vertices out of bounds.
 ### 2D Cartesian Projection using Eigenvectors
 Another view of the graph, which uses the graph's eigenvectors as cartesian coordinates. This can provide useful representations of graphs, with aspects like minimal edge overlapping. The coordinates are calculated by finding the two smallest non-zero eigenvalues of the adjacency matrix, and then using their corresponding eigenvectors as 2d cartesian coordinates.
 ### Information on Vertices and Edges
@@ -18,9 +15,9 @@ The maximum and minimum degree of the graph is displayed in the top left corner 
 The number of components is displayed in the top left corner.
 ### Graphics
 Isperia uses the Raylib library for a simpler access to graphics. It also allows for easy cross-platform graphics, like compiling to both machine code and WebAssembly.
-- Make it so you cannot place vertices out of bounds.
 
 DONE:
+- fix resizing window bugs
 - Implement sprites
     - UIObjects have a reference to a sprite that they draw. (depending on width, height, etc.)
     - Rectangle

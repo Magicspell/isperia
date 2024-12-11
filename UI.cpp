@@ -445,7 +445,7 @@ UIMatrix::UIMatrix(float x, float y, float width, float height, Graph* graph, Ma
 void UIMatrix::draw(float x, float y, float width, float height, State state) {
     UIObject::draw(x, y, width, height, state);
 
-    // Draw text sprites over everything. We use one sprite and draw it multiple times.
+    // Draw text sprites over everything. We use one sprite and draw it multiple times. TODO: Use stack?
     SText* textSprite = new SText(MATRIX_TEXT_COLOR, "", 20, CENTER);
 
     float matrixPadding = MATRIX_PADDING * width;
@@ -470,6 +470,23 @@ void UIMatrix::draw(float x, float y, float width, float height, State state) {
         curY += incrementY;
     }
 }
+
+// UIInfoText
+// -----
+
+UIInfoText::UIInfoText(float x, float y, float width, float height, StringFuncType getNewText, string prefix,
+    int fontSize, TextCentering textCentering): UIObject(x, y, width, height), getNewText(getNewText),
+    prefix(prefix), fontSize(fontSize), textCentering(textCentering) {}
+
+void UIInfoText::draw(float x, float y, float width, float height, State state) {
+    UIObject::draw(x, y, width, height, state);
+
+    // Get text string and draw it. TODO: Use stack?
+    SText* textSprite = new SText(INFOTEXT_COLOR, this->prefix + this->getNewText(), this->fontSize,
+        this->textCentering);
+    textSprite->draw(x, y, width, height);
+}
+
 
 // UIApp
 // -----

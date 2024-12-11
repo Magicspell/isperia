@@ -11,6 +11,7 @@
 #define VERTEX_RADIUS 0.06
 #define MATRIX_TEXT_COLOR WHITE
 #define MATRIX_PADDING 0.01
+#define INFOTEXT_COLOR WHITE
 
 struct State {
     int curTool;
@@ -161,6 +162,21 @@ protected:
     Graph* graph;
     MatType matType;
     vector<SText*>* textSprites;
+};
+
+// Has a function it calls every draw to update what text it is drawing.
+class UIInfoText : public UIObject {
+public:
+	using StringFuncType = std::function<string()>; // typedef for a function pointer
+                                                    // (for a function that returns a string)
+    UIInfoText(float x, float y, float width, float height, StringFuncType getNewText, string prefix = "",
+        int fontSize = 20, TextCentering textCentering = LEFT);
+    virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
+protected:
+    StringFuncType getNewText;
+    string prefix;
+    int fontSize;
+    TextCentering textCentering;
 };
 
 class UIApp {
