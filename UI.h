@@ -9,6 +9,8 @@
 #define DEFAULT_COLOR { 200, 125, 230, 255 }
 #define DEFAULT_CLICK [](){}    // Lambda that does nothing
 #define VERTEX_RADIUS 0.06
+#define MATRIX_TEXT_COLOR WHITE
+#define MATRIX_PADDING 0.01
 
 struct State {
     int curTool;
@@ -152,10 +154,13 @@ protected:
 
 class UIMatrix : public UIObject {
 public:
-    UIMatrix(float x, float y, float width, float height, int** matrix);
-    UIMatrix(float x, float y, float width, float height, int** matrix, vector<Sprite*>* sprites);
+    UIMatrix(float x, float y, float width, float height, Graph* graph, MatType matType);
+    UIMatrix(float x, float y, float width, float height, Graph* graph, MatType matType, vector<Sprite*>* sprites);
+    virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
 protected:
-    int** matrix;
+    Graph* graph;
+    MatType matType;
+    vector<SText*>* textSprites;
 };
 
 class UIApp {

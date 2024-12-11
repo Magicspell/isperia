@@ -68,6 +68,10 @@ public:
     virtual void draw(float x, float y, float width, float height);
     string getText();
     void setText(string text);
+    Font getFont();
+    void setFont(Font font);
+    int getFontSize();
+    void setFontSize(int fontSize);
 protected:
     string text;
     Font font;

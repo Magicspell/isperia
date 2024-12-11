@@ -18,6 +18,8 @@ The maximum and minimum degree of the graph is displayed in the top left corner 
 The number of components is displayed in the top left corner.
 ### Graphics
 Isperia uses the Raylib library for a simpler access to graphics. It also allows for easy cross-platform graphics, like compiling to both machine code and WebAssembly.
+- Make it so you cannot place vertices out of bounds.
+
 DONE:
 - Implement sprites
     - UIObjects have a reference to a sprite that they draw. (depending on width, height, etc.)

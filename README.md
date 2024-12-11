@@ -37,3 +37,5 @@ Isperia is written in C++, with minimal dependencies. It is compiled to machine 
 Isperia uses the Raylib library for a simpler access to graphics. It also allows for easy cross-platform graphics, like compiling to both machine code and WebAssembly.
 ### UI System
 Isperia uses its own UI system, where each UI object has coordinates and dimensions as percentages of their parent's coordinates and dimensions. Then, when the screen needs to be drawn, the pixel values of these numbers are passed down throught the objects. This allows for easy resizability.
+#### Sprite System
+Each UI object has a list of sprites, and then the UI object needs to be drawn, all of its sprites will be drawn to the screen in the order of the list. Some sprites include Rectangles, Squares, Ellipses, Ovals, Text, and Lines. This allows for more complex graphics without using multiple UI objects, like the text on each vertex or the symbols for tools.

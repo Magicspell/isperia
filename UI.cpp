@@ -434,12 +434,42 @@ int UIToolbar::getCurTool() {
 // UIMatrix
 // --------
 
-UIMatrix::UIMatrix(float x, float y, float width, float height, int** matrix):
-    UIObject(x, y, width, height), matrix(matrix) {}
+UIMatrix::UIMatrix(float x, float y, float width, float height, Graph* graph, MatType matType):
+    UIMatrix(x, y, width, height, graph, matType, new vector<Sprite*>()){}
 
-UIMatrix::UIMatrix(float x, float y, float width, float height, int** matrix, vector<Sprite*>* sprites):
-    UIObject(x, y, width, height, sprites), matrix(matrix) {}
+UIMatrix::UIMatrix(float x, float y, float width, float height, Graph* graph, MatType matType, vector<Sprite*>* sprites):
+        UIObject(x, y, width, height, sprites), graph(graph), matType(matType) {
+    this->textSprites = new vector<SText*>(this->graph->getSize());
+}
 
+void UIMatrix::draw(float x, float y, float width, float height, State state) {
+    UIObject::draw(x, y, width, height, state);
+
+    // Draw text sprites over everything. We use one sprite and draw it multiple times.
+    SText* textSprite = new SText(MATRIX_TEXT_COLOR, "", 20, CENTER);
+
+    float matrixPadding = MATRIX_PADDING * width;
+
+    float incrementX = (width - (matrixPadding * 2)) / this->graph->getSize();
+    float incrementY = (height - (matrixPadding * 2)) / this->graph->getSize();
+
+    float curX = x + matrixPadding;
+    float curY = y + matrixPadding;
+    
+    for (int i = 0; i < this->graph->getSize(); i++) {
+        curX = x + matrixPadding;
+        for (int j = 0; j < this->graph->getSize(); j++) {
+            textSprite->setText(to_string(this->graph->getMatByType(this->matType)[i][j]));
+            Vector2 textSize = MeasureTextEx(textSprite->getFont(), textSprite->getText().data(),
+                textSprite->getFontSize(), TEXT_SPACING);
+            textSprite->draw(curX, curY + incrementY / 2, incrementX, 0);
+
+            curX += incrementX;
+        }
+
+        curY += incrementY;
+    }
+}
 
 // UIApp
 // -----

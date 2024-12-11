@@ -98,3 +98,19 @@ void SText::setText(string text) {
 string SText::getText() {
     return this->text;
 }
+
+Font SText::getFont(){
+    return this->font;    
+}
+
+void SText::setFont(Font font){
+    this->font = font;
+}
+
+int SText::getFontSize(){
+    return this->fontSize;    
+}
+
+void SText::setFontSize(int fontSize){
+    this->fontSize = fontSize;
+}

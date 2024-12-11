@@ -1,11 +1,14 @@
 #pragma once
 
+enum MatType {
+    ADJ,
+    LAP
+};
+
 class Graph {
 public:
     Graph();
     Graph(int initialSize);                     // Fills with 0s
-    // Graph(UIGraph* graphUI);
-    // Graph(UIGraph* graphUI, int initialSize);   // Fills with 0s
     ~Graph();
     void addVertex(float x, float y);
     void addVertex(float x, float y, int* connections);
@@ -18,9 +21,12 @@ public:
     void updateUIGraph();
     int getSize();
     int** getAdjMat();
+    int** getLapMat();
+    int** getMatByType(MatType matType);
+    void updateLapMat();
     
 protected:
     int** adjMat;
+    int** lapMat;
     int size;
-    // UIGraph* graphUI;
 };
