@@ -38,7 +38,7 @@ void Graph::addVertex(float x, float y, int* connections) {
 
     for (int i = 0; i < this->size - 1; i++) {
         newAdj[i] = (int*) calloc(this->size, sizeof(int));     // Allocate row.
-        memcpy(newAdj[i], this->adjMat[i], this->size - 1);     // Copy from old matrix.
+        memcpy(newAdj[i], this->adjMat[i], (this->size - 1) * sizeof(int));     // Copy from old matrix.
         newAdj[i][this->size - 1] = connections[i];             // Set connections for last
                                                                 // element.
     }
