@@ -3,15 +3,15 @@
 IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
         backgroundColor(backgroundColor) {
     
-    UIGraph* gUI = new UIGraph(
+    this->gUI = new UIGraph(
         MATRIX_WIDTH + GLOBAL_PADDING * 2,
         GLOBAL_PADDING,
-        1 - TB_WIDTH - MATRIX_WIDTH - GLOBAL_PADDING * 4,
+        1 - TB_WIDTH - MATRIX_WIDTH * 2 - GLOBAL_PADDING * 4,
         1
     );
 
     this->toolbar = new UIToolbar(
-        1 - TB_WIDTH - GLOBAL_PADDING,
+        1 - TB_WIDTH - GLOBAL_PADDING * 2 - MATRIX_WIDTH,
         GLOBAL_PADDING,
         TB_WIDTH,
         1 - GLOBAL_PADDING * 2,
@@ -25,12 +25,29 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
         new vector<Sprite*>{new SRectangle(TOOLBAR_COLOR)}
     );
 
+    this->eigenProjGraphText = new UIObject(
+        1 - MATRIX_WIDTH - GLOBAL_PADDING,
+        GLOBAL_PADDING,
+        MATRIX_WIDTH,
+        TEXT_HEIGHT,
+        new vector<Sprite*>{ new SText(WHITE, "Eigenvector Projection") }
+    );
+
+    this->eigenProjGraph = new UIEigenProjGraph(
+        1 - MATRIX_WIDTH - GLOBAL_PADDING,
+        GLOBAL_PADDING* 2 + TEXT_HEIGHT,
+        MATRIX_WIDTH,
+        MATRIX_WIDTH,
+        this->gUI->getBackendGraph(),
+        new vector<Sprite*>{ new SRectangle(EIGENPROJ_COLOR) }
+    );
+
     this->vertexCountText = new UIInfoText(
         GLOBAL_PADDING,
         GLOBAL_PADDING,
         MATRIX_WIDTH,
         INFOTEXT_HEIGHT,
-        [gUI](){ return to_string(gUI->getBackendGraph()->getSize()); },
+        [this](){ return to_string(this->gUI->getBackendGraph()->getSize()); },
         "Vertex Count: "
     );
 
@@ -39,7 +56,7 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
         GLOBAL_PADDING * 2 + INFOTEXT_HEIGHT,
         MATRIX_WIDTH,
         INFOTEXT_HEIGHT,
-        [gUI](){ return to_string(gUI->getBackendGraph()->getEdgeCount()); },
+        [this](){ return to_string(this->gUI->getBackendGraph()->getEdgeCount()); },
         "Edge Count: "
     );
 
@@ -48,7 +65,7 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
         GLOBAL_PADDING * 3 + MATRIX_LABEL_HEIGHT + INFOTEXT_HEIGHT * 2,
         MATRIX_WIDTH,
         MATRIX_WIDTH,
-        gUI->getBackendGraph(),
+        this->gUI->getBackendGraph(),
         ADJ,
         new vector<Sprite*>{ new SRectangle(MATRIX_COLOR) }
     );
@@ -66,7 +83,7 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
         GLOBAL_PADDING * 4 + MATRIX_LABEL_HEIGHT * 2 + MATRIX_WIDTH + INFOTEXT_HEIGHT * 2,
         MATRIX_WIDTH,
         MATRIX_WIDTH,
-        gUI->getBackendGraph(),
+        this->gUI->getBackendGraph(),
         LAP,
         new vector<Sprite*>{ new SRectangle(MATRIX_COLOR) }
     );
@@ -80,7 +97,9 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
     );
 
     this->mainScreen = this->curScreen;     // SCUFFED
-    this->mainScreen->addChild(gUI);
+    this->mainScreen->addChild(this->gUI);
+    this->mainScreen->addChild(this->eigenProjGraph);
+    this->mainScreen->addChild(this->eigenProjGraphText);
     this->mainScreen->addChild(this->toolbar);
     this->mainScreen->addChild(this->UIAdjMat);
     this->mainScreen->addChild(this->adjMatText);

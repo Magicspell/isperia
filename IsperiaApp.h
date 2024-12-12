@@ -3,7 +3,7 @@
 #include "Graph.h"
 
 #define TB_WIDTH                0.07
-#define MATRIX_WIDTH            0.25
+#define MATRIX_WIDTH            0.2
 #define COLOR_1                 GRAY
 #define MATRIX_COLOR            COLOR_1
 #define TEXT_HEIGHT             0.03
@@ -13,6 +13,7 @@
 #define TOOLBAR_COLOR           COLOR_1 
 #define GLOBAL_PADDING          0.01
 #define INFOTEXT_HEIGHT         TEXT_HEIGHT
+#define EIGENPROJ_COLOR         BLACK
 
 class IsperiaApp : public UIApp {
 public:
@@ -20,6 +21,9 @@ public:
     void update();
 protected:
     Color backgroundColor;
+    UIGraph* gUI;
+    UIEigenProjGraph* eigenProjGraph;
+    UIObject* eigenProjGraphText;
     UIObject* mainScreen;
     UIToolbar* toolbar;
     UIMatrix* UIAdjMat;

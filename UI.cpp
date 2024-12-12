@@ -305,6 +305,73 @@ Graph* UIGraph::getBackendGraph() {
     return this->backendGraph;
 }
 
+// UIEigenProjGraph
+// ----------------
+
+UIEigenProjGraph::UIEigenProjGraph(float x, float y, float width, float height, Graph* backendGraph,
+        vector<Sprite*>* sprites): UIGraph(x, y, width, height, backendGraph, sprites) {
+    this->vertices = new vector<UIVertex*>();
+    this->edges = new vector<UIEdge*>();
+}
+
+Rectangle UIEigenProjGraph::update(float pX, float pY, float pWidth, float pHeight, State state) {
+    Rectangle rect = UIObject::update(pX, pY, pWidth, pHeight, state);
+
+    // Check to rebuild the graph
+    if ((this->vertices->size() != this->backendGraph->getSize())
+            || (this->edges->size() != this->backendGraph->getEdgeCount())) {
+        
+        // Delete vertices
+        for (UIVertex* v : *(this->vertices)) {
+            delete v;
+        }
+        delete this->vertices;
+        this->vertices = new vector<UIVertex*>();
+
+        // Delete edges
+        for (UIEdge* e : *(this->edges)) {
+            delete e;
+        }
+        delete this->edges;
+        this->edges = new vector<UIEdge*>();
+
+        // Rebuild vertices
+        float** coords = this->backendGraph->getEigenCoords();
+
+        for (int i = 0; i < this->backendGraph->getSize(); i++) {
+            // Normalize x, y from -1 to 1 to 0 to 1.
+            float x = (coords[i][0] + 1) / 2;
+            float y = (coords[i][1] + 1) / 2;
+
+            this->vertices->push_back(new UIVertex(x, y, VERTEX_RADIUS, i));
+        }
+
+        // Rebuild edges
+        for (int i = 0; i < this->backendGraph->getSize(); i++) {
+            for (int j = 0; j < this->backendGraph->getSize(); j++) {
+                if (this->backendGraph->getAdjMat()[i][j]) {
+                    this->edges->push_back(new UIEdge(this->vertices->at(i), this->vertices->at(j)));
+                }
+            }
+        }
+    }
+
+    // Normal drawing/updating
+    for (UIVertex* v : *(this->vertices)) {
+        v->update(rect.x, rect.y, rect.width, rect.height);
+    }
+    for (UIEdge* e : *(this->edges)) {
+        e->update(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    return rect;
+}
+
+void UIEigenProjGraph::draw(float x, float y, float width, float height, State state) {
+    UIObject::draw(x, y, width, height, state);
+}
+
+
 // UIVertex
 // --------
 

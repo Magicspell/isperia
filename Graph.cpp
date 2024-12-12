@@ -1,7 +1,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <cmath>
 #include "Graph.h"
+
+#define ROUND_DIGITS 2
 
 using namespace std;
 
@@ -28,6 +31,14 @@ Graph::~Graph() {
     delete this->lapMat;
 }
 
+// Called whenever the graph is changed.
+void Graph::update() {
+    this->updateLapMat();
+    this->updateEdgeCount();
+    this->updateEigen();
+    this->updateEigenCoords();
+}
+
 void Graph::addVertex(float x, float y) {
     this->addVertex(x, y, (int*) calloc(this->size + 1, sizeof(int)));
 }
@@ -48,8 +59,7 @@ void Graph::addVertex(float x, float y, int* connections) {
     delete this->adjMat;    // TODO: Wrong, need to delete all rows
     this->adjMat = newAdj;
 
-    this->updateLapMat();
-    this->updateEdgeCount();
+    this->update();
 }
 
 void Graph::removeVertex(int index) {
@@ -77,8 +87,7 @@ void Graph::removeVertex(int index) {
     delete this->adjMat;                                        // TODO: Wrong, need to delete all rows
     this->adjMat = newAdj;
 
-    this->updateLapMat();
-    this->updateEdgeCount();
+    this->update();
 }
 
 // Adds an edge between two vertices, provided by indices of the adjacency matrix.
@@ -86,8 +95,7 @@ void Graph::addEdge(int v1, int v2) {
     this->adjMat[v1][v2] = 1;
     this->adjMat[v2][v1] = 1;
 
-    this->updateLapMat();
-    this->updateEdgeCount();
+    this->update();
 }
 
 // Removes an edge between two vertices, provided by indexes of the adjacency matrix.
@@ -95,8 +103,7 @@ void Graph::removeEdge(int v1, int v2) {
     this->adjMat[v1][v2] = 0;
     this->adjMat[v2][v1] = 0;
 
-    this->updateLapMat();
-    this->updateEdgeCount();
+    this->update();
 }
 
 void Graph::print() {
@@ -170,4 +177,68 @@ void Graph::updateEdgeCount() {
 
 int Graph::getEdgeCount() {
     return this->edgeCount;
+}
+
+void Graph::updateEigen() {
+    Eigen::MatrixXf myMatrix(this->size, this->size);
+    for (int i = 0; i < this->size; i++) {
+        for (int j = 0; j < this->size; j++) {
+            myMatrix(i, j) = (float) this->adjMat[i][j];
+        }
+    }
+
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> solver(myMatrix);
+    // TODO: FIX LEAKS
+    this->eigenValues = new Eigen::VectorXf(solver.eigenvalues());
+    this->eigenVectors = new Eigen::MatrixXf(solver.eigenvectors());
+}
+
+// Gets the indices of the two smallest non-zero eigenvalues.
+int* Graph::getSmallestEigIndices() {
+    
+    int* lowestIndices = new int[2]{0, 0};
+    float* lowestValues = new float[2]{FLT_MAX, FLT_MAX};
+
+    int i = -1;
+    for (float e : *(this->eigenValues)) {
+        i++;
+        float rounded = round(e * pow(10, ROUND_DIGITS)) / pow(10, ROUND_DIGITS);
+        
+        if (rounded <= 0) continue;
+        if (rounded < lowestValues[0]) {
+            lowestIndices[1] = lowestIndices[0];
+            lowestIndices[0] = i;
+
+            lowestValues[1] = lowestValues[0];
+            lowestValues[0] = e;
+        }
+        else if (rounded < lowestValues[1]) {
+            lowestIndices[1] = i;
+            lowestValues[1] = e;
+        }
+    }
+
+    return lowestIndices;
+}
+
+float** Graph::getEigenCoords() {
+    return this->eigenCoords;
+}
+
+// Uses the eigenvectors of the adjacency matrix to get 2d cartesian coordinates.
+void Graph::updateEigenCoords() {
+    int* indices = this->getSmallestEigIndices();
+
+    Eigen::VectorXf xCoords = (*(this->eigenVectors))(Eigen::all, indices[0]);
+    Eigen::VectorXf yCoords = (*(this->eigenVectors))(Eigen::all, indices[1]);
+
+    float** newCoords = (float**) calloc(this->size, sizeof(float*));
+    for (int i = 0; i < this->size; i++) {
+        newCoords[i] = (float*) calloc(2, sizeof(float));
+
+        newCoords[i][0] = xCoords[i];
+        newCoords[i][1] = yCoords[i];
+    }
+
+    this->eigenCoords = newCoords;
 }

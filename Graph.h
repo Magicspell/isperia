@@ -1,4 +1,5 @@
 #pragma once
+#include "Eigen/Dense"
 
 enum MatType {
     ADJ,
@@ -24,10 +25,18 @@ public:
     void updateLapMat();
     int getEdgeCount();
     void updateEdgeCount();
+    void updateEigen();
+    int* getSmallestEigIndices();
+    void updateEigenCoords();
+    float** getEigenCoords();
+    void update();
     
 protected:
     int** adjMat;
     int** lapMat;
     int size;
     int edgeCount;
+    Eigen::VectorXf* eigenValues;
+    Eigen::MatrixXf* eigenVectors;
+    float** eigenCoords;
 };

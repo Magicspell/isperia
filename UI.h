@@ -140,6 +140,16 @@ protected:
     UIVertex* v1;           // For adding edges
 };
 
+class UIEigenProjGraph : public UIGraph {
+public:
+    UIEigenProjGraph(float x, float y, float widht, float height, Graph* backendGraph = new Graph(),
+        vector<Sprite*>* sprites = new vector<Sprite*>{ new SRectangle(BLACK) });
+    virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
+    virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
+protected:
+
+};
+
 class UIToolbar : public UIObject {
 public:
     UIToolbar(float x, float y, float width, float height);
