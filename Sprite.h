@@ -3,6 +3,8 @@
 #include <string>
 
 #define TEXT_SPACING 2
+#define SVERTEX_PADDING 0.03
+#define SCURSOR_PADDING 0.15
 
 using namespace std;
 
@@ -77,4 +79,18 @@ protected:
     Font font;
     int fontSize;
     TextCentering textCentering;
+};
+
+class SVertex : public SCircle {
+public:
+    SVertex(Color backgroundColor);
+    virtual void draw(float x, float y, float width, float height);
+protected:
+};
+
+class SCursor : public Sprite {
+public:
+    SCursor(Color backgroundColor);
+    virtual void draw(float x, float y, float width, float height);
+protected:
 };

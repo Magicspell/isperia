@@ -6,12 +6,13 @@
 #include "Sprite.h"
 #include "Graph.h"
 
-#define DEFAULT_COLOR { 200, 125, 230, 255 }
-#define DEFAULT_CLICK [](){}    // Lambda that does nothing
-#define VERTEX_RADIUS 0.06
-#define MATRIX_TEXT_COLOR WHITE
-#define MATRIX_PADDING 0.01
-#define INFOTEXT_COLOR WHITE
+#define DEFAULT_COLOR           { 200, 125, 230, 255 }
+#define DEFAULT_CLICK           [](){}    // Lambda that does nothing
+#define VERTEX_RADIUS           0.06
+#define MATRIX_TEXT_COLOR       WHITE
+#define MATRIX_PADDING          0.01
+#define INFOTEXT_COLOR          WHITE
+#define EDGE_DELETE_BUFFER      0.06
 
 struct State {
     int curTool;
@@ -23,7 +24,8 @@ enum Tool {
     SELECT,
     ADD_VERTEX,
     ADD_EDGE,
-    REMOVE_VERTEX
+    REMOVE_VERTEX,
+    REMOVE_EDGE
 };
 
 enum EdgeAddMode {
@@ -152,15 +154,15 @@ protected:
 
 class UIToolbar : public UIObject {
 public:
-    UIToolbar(float x, float y, float width, float height);
-    UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool = 0);
-    UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool,
-        vector<Sprite*>* sprites);
+    UIToolbar(float x, float y, float width, float height, vector<int>* tools = new vector<int>(),
+        int curTool = 0, vector<Sprite*>* sprites = new vector<Sprite*>{ new SRectangle(GRAY) },
+        vector<Sprite*>* toolSprites = new vector<Sprite*>());
     void setCurTool(int tool);
     int getCurTool();
 protected:
     vector<int>* tools;
     int curTool;
+    vector<Sprite*>* toolSprites;
 };
 
 class UIMatrix : public UIObject {

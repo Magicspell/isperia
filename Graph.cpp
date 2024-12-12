@@ -35,8 +35,10 @@ Graph::~Graph() {
 void Graph::update() {
     this->updateLapMat();
     this->updateEdgeCount();
-    this->updateEigen();
-    this->updateEigenCoords();
+    if (this->size > 0) {
+        this->updateEigen();
+        this->updateEigenCoords();
+    }
 }
 
 void Graph::addVertex(float x, float y) {

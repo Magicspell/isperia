@@ -6,8 +6,8 @@
 - Fix loops (either allow them and display them or do not allow them)
 - Make it so you cannot place vertices out of bounds.
 - Sprites for tools icons
-### 2D Cartesian Projection using Eigenvectors
-Another view of the graph, which uses the graph's eigenvectors as cartesian coordinates. This can provide useful representations of graphs, with aspects like minimal edge overlapping. The coordinates are calculated by finding the two smallest non-zero eigenvalues of the adjacency matrix, and then using their corresponding eigenvectors as 2d cartesian coordinates.
+- MagSim?
+- DELETE EDGES
 ### Information on Degree of Vertices
 The maximum and minimum degree of the graph is displayed in the top left corner and when an individual vertex is selected, it's degree is displayed in the bottom center.
 ### Information on Components
@@ -22,3 +22,4 @@ DONE:
     - Rectangle
     - Oval
     - Bitmap
+- Removing last vertex bug

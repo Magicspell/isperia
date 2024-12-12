@@ -19,10 +19,15 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
             SELECT,
             ADD_VERTEX,
             ADD_EDGE,
-            REMOVE_VERTEX
+            REMOVE_VERTEX,
+            REMOVE_EDGE
         },
         ADD_VERTEX,
-        new vector<Sprite*>{new SRectangle(TOOLBAR_COLOR)}
+        new vector<Sprite*>{new SRectangle(TOOLBAR_COLOR)},
+        new vector<Sprite*>{
+            new SCursor(WHITE),
+            new SVertex(RED)
+        }
     );
 
     this->eigenProjGraphText = new UIObject(

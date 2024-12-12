@@ -220,15 +220,49 @@ Rectangle UIGraph::update(float pX, float pY, float pWidth, float pHeight, State
         this->addVertex(x - VERTEX_RADIUS / 2, y - VERTEX_RADIUS / 2);
     }
 
+
     for (UIEdge* e : *(this->edges)) {
-        e->update(rect.x, rect.y, rect.width, rect.height, state);
+        Rectangle edgeRect = e->update(rect.x, rect.y, rect.width, rect.height, state);
+
+
+        // Check for deleting edges
+        if (state.curTool == REMOVE_EDGE && IsMouseButtonPressed(0)) {
+            // float slope = (-1) * (float) e->getY() / (float) e->getX();
+            // float yInt = rect.height + rect.y - ((float) e->getY() * rect.width + rect.y);
+            // Vector2 mousePos = GetMousePosition();
+            // float pX = rect.width + rect.x - mousePos.x;
+            // float pY = rect.height + rect.y - mousePos.y;
+
+            // float globalX = e->getX() * rect.width + rect.x;
+            // float globalY = e->getY() * rect.height  + rect.y;
+
+            // float slope = (-1) * (float) globalY / (float) globalX;
+            // float yInt = globalY - slope * globalX;
+            Vector2 mousePos = GetMousePosition();
+            float localMouseX = (mousePos.x - rect.x) / rect.width;
+            float localMouseY = (rect.height - (mousePos.y - rect.y)) / rect.height;
+
+            float x1 = e->getVertex1()->getX();
+            float y1 = this->height - e->getVertex1()->getY();
+            float x2 = e->getVertex2()->getX();
+            float y2 = this->height - e->getVertex2()->getY();
+
+            float slope = (y2 - y1) / (x2 - x1);
+            float yInt = y1 - slope * x1;
+
+
+            if (pointInRect(localMouseX, localMouseY, min(x1, x2), min(y1, y2), abs(x2 - x1), abs(y2 - y1)) 
+                    && pointCloseToLine(localMouseX, localMouseY, slope, yInt, EDGE_DELETE_BUFFER)) {
+                this->removeEdge(e);
+            }
+        }
     }
 
     for (UIVertex* v : *(this->vertices)) {
-        Rectangle vrect = v->update(rect.x, rect.y, rect.width, rect.height, state);
+        Rectangle vertexRect = v->update(rect.x, rect.y, rect.width, rect.height, state);
 
         // If we are clicking on a vertex, proceed according to tool.
-        if (IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), vrect)) {
+        if (IsMouseButtonPressed(0) && pointInRect(GetMousePosition(), vertexRect)) {
             switch (state.curTool) {
             case ADD_EDGE:
                 switch (this->edgeAddMode) {
@@ -463,32 +497,41 @@ UIVertex* UIEdge::getVertex2() {
 // UIToolbar
 // ---------
 
-UIToolbar::UIToolbar(float x, float y, float width, float height):
-    UIToolbar(x, y, width, height, new vector<int>()) {}
+// UIToolbar::UIToolbar(float x, float y, float width, float height):
+//     UIToolbar(x, y, width, height, new vector<int>()) {}
 
 UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools,
-        int curTool, vector<Sprite*>* sprites):
-        UIObject(x, y, width, height, sprites), tools(tools), curTool(curTool) {
+        int curTool, vector<Sprite*>* sprites, vector<Sprite*>* toolSprites):
+        UIObject(x, y, width, height, sprites), tools(tools), curTool(curTool), toolSprites(toolSprites) {
     // Set up tool buttons
     float paddingX = 0.1;
     float paddingY = 0.01;
     float buttonSize = 1.0 / this->tools->size();
     float curY = 0;
+    int i = 0;
     for (int t : *(this->tools)) {
+        Sprite* s;
+        if (i >= this->toolSprites->size()) {
+            s = new SText(BLACK, to_string(t), 20, CENTER);
+        } else {
+            s = this->toolSprites->at(i);
+        }
+
         UIClickable* b = new UIClickable(paddingX, curY + paddingY, 1 - paddingX * 2,
                 buttonSize - paddingY * 2, new vector<Sprite*>{
             new SRectangle(LIGHTGRAY),
-            new SText(BLACK, to_string(t), 20, CENTER)
+            s
         }, [this, t](){
             this->setCurTool(t);
         });
         this->children->push_back(b);
         curY += buttonSize;
+        i++;
     }
 }
 
-UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool):
-    UIToolbar(x, y, width, height, tools, curTool, new vector<Sprite*>{ new SRectangle(GRAY) }) {}
+// UIToolbar::UIToolbar(float x, float y, float width, float height, vector<int>* tools, int curTool):
+//     UIToolbar(x, y, width, height, tools, curTool, new vector<Sprite*>{ new SRectangle(GRAY) }) {}
 
 void UIToolbar::setCurTool(int tool) {
     this->curTool = tool;
