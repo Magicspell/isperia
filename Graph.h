@@ -3,7 +3,9 @@
 
 enum MatType {
     ADJ,
-    LAP
+    LAP,
+    EIG_VAL,
+    EIG_VEC
 };
 
 class Graph {
@@ -12,16 +14,18 @@ public:
     Graph(int initialSize);                     // Fills with 0s
     ~Graph();
     void addVertex(float x, float y);
-    void addVertex(float x, float y, int* connections);
+    void addVertex(float x, float y, float* connections);
     void removeVertex(int index);
     void addEdge(int v1, int v2);
     void removeEdge(int v1, int v2);
     void print();
     void updateUIGraph();
     int getSize();
-    int** getAdjMat();
-    int** getLapMat();
-    int** getMatByType(MatType matType);
+    float** getAdjMat();
+    float** getLapMat();
+    float** getEigValMat();
+    float** getEigVecMat();
+    float** getMatByType(MatType matType);
     void updateLapMat();
     int getEdgeCount();
     void updateEdgeCount();
@@ -34,8 +38,10 @@ public:
     int getMinDegree();
     
 protected:
-    int** adjMat;
-    int** lapMat;
+    float** adjMat;
+    float** lapMat;
+    float** eigValMat;
+    float** eigVecMat;
     int size;
     int edgeCount;
     Eigen::VectorXf* eigenValues;

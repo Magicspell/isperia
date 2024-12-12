@@ -9,12 +9,16 @@
 using namespace std;
 
 Graph::Graph(int size): size(size) {
-    this->adjMat = (int**) calloc(size, sizeof(int*));
-    this->lapMat = (int**) calloc(size, sizeof(int*));
+    this->adjMat = (float**) calloc(size, sizeof(float*));
+    this->lapMat = (float**) calloc(size, sizeof(float*));
+    this->eigValMat = (float**) calloc(this->size, sizeof(float*));
+    this->eigVecMat = (float**) calloc(this->size, sizeof(float*));
 
     for (int i = 0; i < size; i++) {
-        this->adjMat[i] = (int*) calloc(size, sizeof(int));
-        this->lapMat[i] = (int*) calloc(size, sizeof(int));
+        this->adjMat[i] = (float*) calloc(size, sizeof(float));
+        this->lapMat[i] = (float*) calloc(size, sizeof(float));
+        this->eigValMat[i] = (float*) calloc(this->size, sizeof(float));
+        this->eigVecMat[i] = (float*) calloc(this->size, sizeof(float));
     }
     this->updateEdgeCount();
 }
@@ -42,17 +46,17 @@ void Graph::update() {
 }
 
 void Graph::addVertex(float x, float y) {
-    this->addVertex(x, y, (int*) calloc(this->size + 1, sizeof(int)));
+    this->addVertex(x, y, (float*) calloc(this->size + 1, sizeof(float)));
 }
 
-void Graph::addVertex(float x, float y, int* connections) {
+void Graph::addVertex(float x, float y, float* connections) {
     this->size += 1;
 
-    int** newAdj = (int**) calloc(this->size, sizeof(int*));                    // Allocate new space.
+    float** newAdj = (float**) calloc(this->size, sizeof(float*));                    // Allocate new space.
 
     for (int i = 0; i < this->size - 1; i++) {
-        newAdj[i] = (int*) calloc(this->size, sizeof(int));                     // Allocate row.
-        memcpy(newAdj[i], this->adjMat[i], (this->size - 1) * sizeof(int));     // Copy from old matrix.
+        newAdj[i] = (float*) calloc(this->size, sizeof(float));                     // Allocate row.
+        memcpy(newAdj[i], this->adjMat[i], (this->size - 1) * sizeof(float));     // Copy from old matrix.
         newAdj[i][this->size - 1] = connections[i];                             // Set connections for last
                                                                                 // element.
     }
@@ -67,14 +71,14 @@ void Graph::addVertex(float x, float y, int* connections) {
 void Graph::removeVertex(int index) {
     this->size -= 1;
 
-    int** newAdj = (int**) calloc(this->size, sizeof(int*));            // Allocate new space.
+    float** newAdj = (float**) calloc(this->size, sizeof(float*));            // Allocate new space.
 
     for (int i = 0; i < this->size + 1; i++) {
         if (i != index) {
             int curI = i;
             if (i > index) curI -= 1;
 
-            newAdj[curI] = (int*) calloc(this->size, sizeof(int));      // Allocate row.
+            newAdj[curI] = (float*) calloc(this->size, sizeof(float));      // Allocate row.
             for (int j = 0; j < this->size + 1; j++) {                  // Copy from old matrix.
                 if (j != index) {                                       // Make sure we dont copy element from
                     int curJ = j;                                       // column we are removing.
@@ -121,29 +125,41 @@ int Graph::getSize() {
     return this->size;
 }
 
-int** Graph::getAdjMat() {
+float** Graph::getAdjMat() {
     return this->adjMat;
 }
 
-int** Graph::getLapMat() {
+float** Graph::getLapMat() {
     return this->lapMat;
 }
 
-int** Graph::getMatByType(MatType matType) {
+float** Graph::getEigValMat(){
+    return this->eigValMat;
+}
+
+float** Graph::getEigVecMat(){
+    return this->eigVecMat;
+}
+
+float** Graph::getMatByType(MatType matType) {
     switch (matType) {
     case ADJ:
         return this->getAdjMat();
     case LAP:
         return this->getLapMat();
+    case EIG_VAL:
+        return this->getEigValMat();
+    case EIG_VEC:
+        return this->getEigVecMat();
     }
 }
 
 void Graph::updateLapMat() {
     // Calculate the laplacian matrix: L = D - A
 
-    int** newLap = (int**) calloc(this->size, sizeof(int*));            // Allocate new space.
+    float** newLap = (float**) calloc(this->size, sizeof(float*));            // Allocate new space.
     for (int i = 0; i < this->size; i++) {
-        newLap[i] = (int*) calloc(this->size, sizeof(int));             // Allocate row.
+        newLap[i] = (float*) calloc(this->size, sizeof(float));             // Allocate row.
         
         // Calculate degree (just sum of adj row)
         int degree = 0;
@@ -193,6 +209,21 @@ void Graph::updateEigen() {
     // TODO: FIX LEAKS
     this->eigenValues = new Eigen::VectorXf(solver.eigenvalues());
     this->eigenVectors = new Eigen::MatrixXf(solver.eigenvectors());
+
+    // Update other mats
+    delete this->eigValMat;
+    this->eigValMat = (float**) calloc(this->size, sizeof(float*));
+    delete this->eigVecMat;
+    this->eigVecMat = (float**) calloc(this->size, sizeof(float*));
+    for (int i = 0; i < this->size; i++) {
+        this->eigValMat[i] = (float*) calloc(1, sizeof(float));
+        this->eigValMat[i][0] = (*(this->eigenValues))[i];
+
+        this->eigVecMat[i] = (float*) calloc(this->size, sizeof(float));
+        for (int j = 0; j < this->size; j++) {
+            this->eigVecMat[i][j] = (*(this->eigenVectors))(i, j);
+        }
+    }
 }
 
 // Gets the indices of the two smallest non-zero eigenvalues.

@@ -577,13 +577,39 @@ void UIMatrix::draw(float x, float y, float width, float height, State state) {
     
     for (int i = 0; i < this->graph->getSize(); i++) {
         curX = x + matrixPadding;
-        for (int j = 0; j < this->graph->getSize(); j++) {
-            textSprite->setText(to_string(this->graph->getMatByType(this->matType)[i][j]));
+
+        if (this->matType != EIG_VAL) {
+            for (int j = 0; j < this->graph->getSize(); j++) {
+                int roundNum = 1;
+                if (this->matType == ADJ || this->matType == LAP) {
+                    roundNum = 0;
+                }
+
+                string t = to_string_with_precision(this->graph->getMatByType(this->matType)[i][j], roundNum);
+
+                if (t == "-0") t = "0"; // TODO: SCUFFED
+
+                textSprite->setText(t);
+
+                Vector2 textSize = MeasureTextEx(textSprite->getFont(), textSprite->getText().data(),
+                    textSprite->getFontSize(), TEXT_SPACING);
+                textSprite->draw(curX, curY + incrementY / 2, incrementX, 0);
+
+                curX += incrementX;
+            }
+        } else {
+            int roundNum = 1;
+            if (this->matType == ADJ || this->matType == LAP) {
+                roundNum = 0;
+            }
+
+            string t = to_string_with_precision(this->graph->getMatByType(this->matType)[i][0], roundNum);
+
+            textSprite->setText(t);
+
             Vector2 textSize = MeasureTextEx(textSprite->getFont(), textSprite->getText().data(),
                 textSprite->getFontSize(), TEXT_SPACING);
             textSprite->draw(curX, curY + incrementY / 2, incrementX, 0);
-
-            curX += incrementX;
         }
 
         curY += incrementY;

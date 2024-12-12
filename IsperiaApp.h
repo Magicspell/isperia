@@ -30,6 +30,10 @@ protected:
     UIObject* adjMatText;
     UIMatrix* UILapMat;
     UIObject* lapMatText;
+    UIMatrix* UIEigValMat;
+    UIObject* eigValText;
+    UIMatrix* UIEigVecMat;
+    UIObject* eigVecText;
     UIInfoText* vertexCountText;
     UIInfoText* edgeCountText;
     UIInfoText* maxDegreeText;

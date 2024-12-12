@@ -1,5 +1,8 @@
 // Common helper functions
 #include <cmath>
+#include <iostream>
+#include <iomanip>
+#include <sstream>
 #include "raylib.h"
 
 bool pointInRect(float pX, float pY, float rX, float rY, float rWidth, float rHeight) {
@@ -31,4 +34,11 @@ bool pointCloseToLine(float pX, float pY, float slope, float yInt, float buffer)
 
 bool pointCloseToLine(Vector2 point, float slope, float y, float buffer) {
     return pointCloseToLine(point.x, point.y, slope, y, buffer);
+}
+
+
+string to_string_with_precision(float value, int precision) {
+    ostringstream oss;
+    oss << std::fixed << std::setprecision(precision) << value;
+    return oss.str();
 }

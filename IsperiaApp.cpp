@@ -40,11 +40,48 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
 
     this->eigenProjGraph = new UIEigenProjGraph(
         1 - MATRIX_WIDTH - GLOBAL_PADDING,
-        GLOBAL_PADDING* 2 + TEXT_HEIGHT,
+        GLOBAL_PADDING * 2 + TEXT_HEIGHT,
         MATRIX_WIDTH,
         MATRIX_WIDTH,
         this->gUI->getBackendGraph(),
         new vector<Sprite*>{ new SRectangle(EIGENPROJ_COLOR) }
+    );
+
+    this->eigValText = new UIObject(
+        1 - MATRIX_WIDTH - GLOBAL_PADDING,
+        GLOBAL_PADDING * 2 + TEXT_HEIGHT + MATRIX_WIDTH,
+        MATRIX_WIDTH,
+        MATRIX_LABEL_HEIGHT,
+        new vector<Sprite*>{ new SText(MATRIX_LABEL_COLOR, "Eigenvalues",
+            MATRIX_LABEL_FONTSIZE, LEFT) }
+    );
+
+    this->UIEigValMat = new UIMatrix(
+        1 - MATRIX_WIDTH - GLOBAL_PADDING,
+        GLOBAL_PADDING * 3 + TEXT_HEIGHT * 2 + MATRIX_WIDTH,
+        MATRIX_WIDTH,
+        MATRIX_WIDTH,
+        this->gUI->getBackendGraph(),
+        EIG_VAL,
+        new vector<Sprite*>{ new SRectangle(MATRIX_COLOR) }
+    );
+
+    this->eigVecText = new UIObject(
+        1 - MATRIX_WIDTH - GLOBAL_PADDING,
+        GLOBAL_PADDING * 4 + TEXT_HEIGHT * 2 + MATRIX_WIDTH * 2,
+        MATRIX_WIDTH,
+        MATRIX_LABEL_HEIGHT,
+        new vector<Sprite*>{ new SText(MATRIX_LABEL_COLOR, "Eigenvectors", MATRIX_LABEL_FONTSIZE, LEFT) }
+    );
+
+    this->UIEigVecMat = new UIMatrix(
+        1 - MATRIX_WIDTH - GLOBAL_PADDING,
+        GLOBAL_PADDING * 4 + TEXT_HEIGHT * 3 + MATRIX_WIDTH * 2,
+        MATRIX_WIDTH,
+        MATRIX_WIDTH,
+        this->gUI->getBackendGraph(),
+        EIG_VEC,
+        new vector<Sprite*>{ new SRectangle(MATRIX_COLOR) }
     );
 
     this->vertexCountText = new UIInfoText(
@@ -128,6 +165,10 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
     this->mainScreen->addChild(this->adjMatText);
     this->mainScreen->addChild(this->UILapMat);
     this->mainScreen->addChild(this->lapMatText);
+    this->mainScreen->addChild(this->UIEigVecMat);
+    this->mainScreen->addChild(this->eigVecText);
+    this->mainScreen->addChild(this->UIEigValMat);
+    this->mainScreen->addChild(this->eigValText);
     this->mainScreen->addChild(this->vertexCountText);
     this->mainScreen->addChild(this->edgeCountText);
     this->mainScreen->addChild(this->maxDegreeText);
