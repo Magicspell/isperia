@@ -183,6 +183,7 @@ void UIGraph::addVertex(float x, float y) {
 }
 
 void UIGraph::addEdge(int v1, int v2) {
+    // cout << "v1: " << v1 << ", v2: " << v2;
     this->edges->push_back(new UIEdge(this->vertices->at(v1), this->vertices->at(v2)));
     this->backendGraph->addEdge(v1, v2);
 }
@@ -391,11 +392,11 @@ Rectangle UIEigenProjGraph::update(float pX, float pY, float pWidth, float pHeig
     }
 
     // Normal drawing/updating
-    for (UIVertex* v : *(this->vertices)) {
-        v->update(rect.x, rect.y, rect.width, rect.height);
-    }
     for (UIEdge* e : *(this->edges)) {
         e->update(rect.x, rect.y, rect.width, rect.height);
+    }
+    for (UIVertex* v : *(this->vertices)) {
+        v->update(rect.x, rect.y, rect.width, rect.height);
     }
 
     return rect;
@@ -475,12 +476,20 @@ Rectangle UIEdge::update(float pX, float pY, float pWidth, float pHeight, State 
     float y1 = pY + pHeight * ((this->vertex1->getHeight()  / 2) + this->vertex1->getY());
     float x2 = pX + pWidth  * ((this->vertex2->getWidth()   / 2) + this->vertex2->getX());
     float y2 = pY + pHeight * ((this->vertex2->getHeight()  / 2) + this->vertex2->getY());
-
+    
     // Draw sprite. NOTE/TODO: this will break when the sprite isnt an SLine, since we are
     // not using width/height. Also, TODO, weird because Sprite::draw args are x, y, width,
     // and height and SLine::draw is x1, y1, x2, y2, so the arg locations mean different things.
 
-    this->draw(x1, y1, x2, y2);
+
+    if (this->vertex1->getId() != this->vertex2->getId()) {
+        // UIObject::draw(x, y, width, height, state);
+        this->draw(x1, y1, x2, y2);
+    } else {
+        // Loop case
+        float radius = VERTEX_RADIUS * pWidth / 2;
+        DrawCircleLines(x1 + radius / 2, y1 + radius / 2, radius, WHITE);
+    }
 
     return {x1, y1, x2 - x1, y2 - y1};  // TODO: Not actually the rectangle bc width/height
                                         // could be negative.

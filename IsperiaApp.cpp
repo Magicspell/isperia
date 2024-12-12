@@ -65,9 +65,27 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
         "Edge Count: "
     );
 
+    this->maxDegreeText = new UIInfoText(
+        GLOBAL_PADDING,
+        GLOBAL_PADDING * 3 + INFOTEXT_HEIGHT * 2,
+        MATRIX_WIDTH,
+        INFOTEXT_HEIGHT,
+        [this](){ return to_string(this->gUI->getBackendGraph()->getMaxDegree()); },
+        "Max Degree: "
+    );
+
+    this->minDegreeText = new UIInfoText(
+        GLOBAL_PADDING,
+        GLOBAL_PADDING * 4 + INFOTEXT_HEIGHT * 3,
+        MATRIX_WIDTH,
+        INFOTEXT_HEIGHT,
+        [this](){ return to_string(this->gUI->getBackendGraph()->getMinDegree()); },
+        "Min Degree: "
+    );
+
     this->UIAdjMat = new UIMatrix(
         GLOBAL_PADDING,
-        GLOBAL_PADDING * 3 + MATRIX_LABEL_HEIGHT + INFOTEXT_HEIGHT * 2,
+        GLOBAL_PADDING * 5 + MATRIX_LABEL_HEIGHT + INFOTEXT_HEIGHT * 4,
         MATRIX_WIDTH,
         MATRIX_WIDTH,
         this->gUI->getBackendGraph(),
@@ -77,7 +95,7 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
     
     this->adjMatText = new UIObject(
         GLOBAL_PADDING,
-        GLOBAL_PADDING * 3 + INFOTEXT_HEIGHT * 2,
+        GLOBAL_PADDING * 5 + INFOTEXT_HEIGHT * 4,
         MATRIX_WIDTH,
         MATRIX_LABEL_HEIGHT,
         new vector<Sprite*>{ new SText(MATRIX_LABEL_COLOR, "Adjacency Matrix", MATRIX_LABEL_FONTSIZE, LEFT) }
@@ -85,7 +103,7 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
 
     this->UILapMat = new UIMatrix(
         GLOBAL_PADDING,
-        GLOBAL_PADDING * 4 + MATRIX_LABEL_HEIGHT * 2 + MATRIX_WIDTH + INFOTEXT_HEIGHT * 2,
+        GLOBAL_PADDING * 6 + MATRIX_LABEL_HEIGHT * 2 + MATRIX_WIDTH + INFOTEXT_HEIGHT * 4,
         MATRIX_WIDTH,
         MATRIX_WIDTH,
         this->gUI->getBackendGraph(),
@@ -95,7 +113,7 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
     
     this->lapMatText = new UIObject(
         GLOBAL_PADDING,
-        GLOBAL_PADDING * 4 + MATRIX_LABEL_HEIGHT + MATRIX_WIDTH + INFOTEXT_HEIGHT * 2,
+        GLOBAL_PADDING * 6 + MATRIX_LABEL_HEIGHT + MATRIX_WIDTH + INFOTEXT_HEIGHT * 4,
         MATRIX_WIDTH,
         MATRIX_LABEL_HEIGHT,
         new vector<Sprite*>{ new SText(MATRIX_LABEL_COLOR, "Laplacian Matrix", MATRIX_LABEL_FONTSIZE, LEFT) }
@@ -112,6 +130,8 @@ IsperiaApp::IsperiaApp(Color backgroundColor): UIApp(new UIObject(0, 0, 1, 1)),
     this->mainScreen->addChild(this->lapMatText);
     this->mainScreen->addChild(this->vertexCountText);
     this->mainScreen->addChild(this->edgeCountText);
+    this->mainScreen->addChild(this->maxDegreeText);
+    this->mainScreen->addChild(this->minDegreeText);
 }
 
 void IsperiaApp::update() {

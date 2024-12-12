@@ -111,6 +111,7 @@ public:
     UIEdge(UIVertex* vertex1, UIVertex* vertex2);             // Default sprite: Line
     UIEdge(UIVertex* vertex1, UIVertex* vertex2, vector<Sprite*>* sprites);
     virtual Rectangle update(float pX, float pY, float pWidth, float pHeight, State state = DEFAULT_STATE);
+    // virtual void draw(float x, float y, float width, float height, State state = DEFAULT_STATE);
     UIVertex* getVertex1();
     UIVertex* getVertex2();
 protected:

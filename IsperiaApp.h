@@ -32,4 +32,6 @@ protected:
     UIObject* lapMatText;
     UIInfoText* vertexCountText;
     UIInfoText* edgeCountText;
+    UIInfoText* maxDegreeText;
+    UIInfoText* minDegreeText;
 };

@@ -30,6 +30,8 @@ public:
     void updateEigenCoords();
     float** getEigenCoords();
     void update();
+    int getMaxDegree();
+    int getMinDegree();
     
 protected:
     int** adjMat;

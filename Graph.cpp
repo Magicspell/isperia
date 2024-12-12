@@ -244,3 +244,28 @@ void Graph::updateEigenCoords() {
 
     this->eigenCoords = newCoords;
 }
+
+int Graph::getMaxDegree() {
+    int ret = 0;
+    for (int i = 0; i < this->size; i++) {
+        int d = 0;
+        for (int j = 0; j < this->size; j++) {
+            d += this->adjMat[i][j];
+        }
+        if (d > ret) ret = d;
+    }
+    return ret;
+}
+
+int Graph::getMinDegree() {
+    int ret = INT_MAX;
+    for (int i = 0; i < this->size; i++) {
+        int d = 0;
+        for (int j = 0; j < this->size; j++) {
+            d += this->adjMat[i][j];
+        }
+        if (d < ret) ret = d;
+    }
+    if (ret == INT_MAX) ret = 0;
+    return ret;
+}
